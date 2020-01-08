@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 require 'terminal-table'
+require 'uri'
+require 'pg'
 
 module RubyPGExtras
+  @@database_url = nil
+
   QUERIES = %i(
     bloat blocking cache_hit
     calls extensions
@@ -23,7 +27,7 @@ module RubyPGExtras
   end
 
   def self.run_query(query_name:, in_format:)
-    result = connection.execute(
+    result = connection.exec(
       sql_for(query_name: query_name)
     )
 
@@ -78,7 +82,23 @@ module RubyPGExtras
   end
 
   def self.connection
-    ActiveRecord::Base.connection
+    database_uri = URI.parse(database_url)
+
+    @_connection ||= PG.connect(
+      dbname: database_uri.path[1..-1],
+      host: database_uri.host,
+      port: database_uri.port,
+      user: database_uri.user,
+      password: database_uri.password
+    )
+  end
+
+  def self.database_url=(value)
+    @@database_url = value
+  end
+
+  def self.database_url
+    @@database_url || ENV.fetch("DATABASE_URL")
   end
 
   %i(

@@ -25,4 +25,13 @@ describe RubyPGExtras do
       end.not_to raise_error
     end
   end
+
+  describe "#database_url=" do
+    it "setting custom database URL works" do
+      RubyPGExtras.database_url = ENV.fetch("DATABASE_URL")
+      expect do
+        RubyPGExtras.bloat(in_format: :hash)
+      end.not_to raise_error
+    end
+  end
 end
