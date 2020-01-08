@@ -14,12 +14,6 @@ gem 'ruby-pg-extras'
 
 ### Usage
 
-Each command can be used as a rake task, or a directly from the Ruby code.
-
-```bash
-rake pg_extras:cache_hit
-```
-
 ```ruby
 RubyPGExtras.cache_hit
 ```
@@ -55,8 +49,10 @@ RubyPGExtras.cache_hit(in_format: :raw) =>
 
 #### `cache_hit`
 
-```bash
-$ rake pg_extras:cache_hit
+```ruby
+
+RubyPGExtras.cache_hit
+
       name      |         ratio
 ----------------+------------------------
  index hit rate | 0.99957765013541945832
@@ -68,8 +64,10 @@ This command provides information on the efficiency of the buffer cache, for bot
 
 #### `index_usage`
 
-```
-$ rake pg_extras:index_usage
+```ruby
+
+RubyPGExtras.index_usage
+
        relname       | percent_of_times_index_used | rows_in_table
 ---------------------+-----------------------------+---------------
  events              |                          65 |       1217347
@@ -84,8 +82,10 @@ This command provides information on the efficiency of indexes, represented as w
 
 ### `locks`
 
-```
-$ rake pg_extras:locks
+```ruby
+
+RubyPGExtras.locks
+
  procpid | relname | transactionid | granted |     query_snippet     |       age
 ---------+---------+---------------+---------+-----------------------+-----------------
    31776 |         |               | t       | <IDLE> in transaction | 00:19:29.837898
@@ -101,16 +101,20 @@ This command displays queries that have taken out an exlusive lock on a relation
 
 ### `all_locks`
 
-```
-$ rake pg_extras:all_locks
+```ruby
+
+RubyPGExtras.all_locks
+
 ```
 
 This command displays all the current locks, regardless of their type.
 
 ### `outliers`
 
-```
-$ rake pg_extras:outliers
+```ruby
+
+RubyPGExtras.outliers
+
                    qry                   |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
 -----------------------------------------+------------------+----------------+-------------+--------------
  SELECT * FROM archivable_usage_events.. | 154:39:26.431466 | 72.2%          | 34,211,877  | 00:00:00
@@ -132,8 +136,10 @@ Typically, an efficient query will have an appropriate ratio of calls to total e
 
 ### `calls`
 
-```
-$ rake pg_extras:calls
+```ruby
+
+RubyPGExtras.calls
+
                    qry                   |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
 -----------------------------------------+------------------+----------------+-------------+--------------
  SELECT * FROM usage_events WHERE (alp.. | 01:18:11.073333  | 0.6%           | 102,120,780 | 00:00:00
@@ -153,8 +159,10 @@ This command is much like `pg:outliers`, but ordered by the number of times a st
 
 ### `blocking`
 
-```
-$ rake pg_extras:blocking
+```ruby
+
+RubyPGExtras.blocking
+
  blocked_pid |    blocking_statement    | blocking_duration | blocking_pid |                                        blocked_statement                           | blocked_duration
 -------------+--------------------------+-------------------+--------------+------------------------------------------------------------------------------------+------------------
          461 | select count(*) from app | 00:00:03.838314   |        15682 | UPDATE "app" SET "updated_at" = '2013-03-04 15:07:04.746688' WHERE "id" = 12823149 | 00:00:03.821826
@@ -165,8 +173,10 @@ This command displays statements that are currently holding locks that other sta
 
 #### `total_index_size`
 
-```
-$ rake pg_extras:total_index_size
+```ruby
+
+RubyPGExtras.total_index_size
+
   size
 -------
  28194 MB
@@ -177,8 +187,10 @@ This command displays the total size of all indexes on the database, in MB. It i
 
 ### `index_size`
 
-```
-$ rake pg_extras:index_size
+```ruby
+
+RubyPGExtras.index_size
+
                              name                              |  size
 ---------------------------------------------------------------+---------
  idx_activity_attemptable_and_type_lesson_enrollment           | 5196 MB
@@ -203,8 +215,10 @@ This command displays the size of each each index in the database, in MB. It is 
 
 ### `table_size`
 
-```
-$ rake pg_extras:table_size
+```ruby
+
+RubyPGExtras.table_size
+
                              name                              |  size
 ---------------------------------------------------------------+---------
  learning_coaches                                              |  196 MB
@@ -219,8 +233,10 @@ This command displays the size of each table in the database, in MB. It is calcu
 
 ### `table_indexes_size`
 
-```
-$ rake pg_extras:table-indexes-size
+```ruby
+
+RubyPGExtras.table_indexes_size
+
                              table                             | indexes_size
 ---------------------------------------------------------------+--------------
  learning_coaches                                              |    153 MB
@@ -235,8 +251,10 @@ This command displays the total size of indexes for each table, in MB. It is cal
 
 ### `total_table_size`
 
-```
-$ rake pg_extras:total_table_size
+```ruby
+
+RubyPGExtras.total_table_size
+
                              name                              |  size
 ---------------------------------------------------------------+---------
  learning_coaches                                              |  349 MB
@@ -251,8 +269,10 @@ This command displays the total size of each table in the database, in MB. It is
 
 ### `unused_indexes`
 
-```
-$ rake pg_extras:unused_indexes
+```ruby
+
+RubyPGExtras.unused_indexes
+
           table      |                       index                | index_size | index_scans
 ---------------------+--------------------------------------------+------------+-------------
  public.grade_levels | index_placement_attempts_on_grade_level_id | 97 MB      |           0
@@ -265,8 +285,10 @@ This command displays indexes that have < 50 scans recorded against them, and ar
 
 ### `seq_scans`
 
-```
-$ rake pg_extras:seq_scans
+```ruby
+
+RubyPGExtras.seq_scans
+
 
                name                |  count
 -----------------------------------+----------
@@ -293,8 +315,10 @@ This command displays the number of sequential scans recorded against all tables
 
 ### long_running_queries
 
-```
-$ rake pg_extras:long_running_queries
+```ruby
+
+RubyPGExtras.long_running_queries
+
 
   pid  |    duration     |                                      query
 -------+-----------------+---------------------------------------------------------------------------------------
@@ -308,8 +332,10 @@ This command displays currently running queries, that have been running for long
 
 ### records_rank
 
-```
-$ rake pg_extras:records_rank
+```ruby
+
+RubyPGExtras.records_rank
+
                name                | estimated_count
 -----------------------------------+-----------------
  tastypie_apiaccess                |          568891
@@ -325,8 +351,10 @@ This command displays an estimated count of rows per table, descending by estima
 
 ### bloat
 
-```
-$ rake pg_extras:bloat
+```ruby
+
+RubyPGExtras.bloat
+
 
  type  | schemaname |           object_name         | bloat |   waste
 -------+------------+-------------------------------+-------+----------
@@ -341,8 +369,10 @@ This command displays an estimation of table "bloat" – space allocated to a re
 
 ### vacuum_stats
 
-```
-$ rake pg_extras:vacuum_stats
+```ruby
+
+RubyPGExtras.vacuum_stats
+
  schema |         table         | last_vacuum | last_autovacuum  |    rowcount    | dead_rowcount  | autovacuum_threshold | expect_autovacuum
 --------+-----------------------+-------------+------------------+----------------+----------------+----------------------+-------------------
  public | log_table             |             | 2013-04-26 17:37 |         18,030 |              0 |          3,656       |
@@ -356,8 +386,10 @@ This command displays statistics related to vacuum operations for each table, in
 
 ### mandelbrot
 
-```
-$ rake pg_extras:mandelbrot
+```ruby
+
+RubyPGExtras.mandelbrot
+
 ```
 
 This command outputs the Mandelbrot set, calculated through SQL.
