@@ -101,14 +101,7 @@ module RubyPGExtras
     @@database_url || ENV.fetch("DATABASE_URL")
   end
 
-  %i(
-    connection
-    display_result
-    sql_for
-    sql_path_for
-  ).each do |method_name|
-    private_class_method method_name
-  end
+  private_class_method :connection
 end
 
 require 'ruby-pg-extras/railtie' if defined?(Rails)
