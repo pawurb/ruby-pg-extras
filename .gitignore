@@ -1,0 +1,6 @@
+Gemfile.lock
+.ruby-version
+pkg/
+*.gem
+docker-compose.yml
+
