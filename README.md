@@ -16,6 +16,20 @@ gem 'ruby-pg-extras'
 
 ### Usage
 
+Gem expects the `ENV['DATABASE_URL']` value in the following format:
+
+```ruby
+ENV["DATABASE_URL"] = "postgresql://postgres:secret@localhost:5432/database_name"
+```
+
+Alternatively you can set it using the module class method:
+
+```ruby
+RubyPGExtras.database_url = "postgresql://postgres:secret@localhost:5432/database_name"
+```
+
+You can run queries using a simple Ruby API:
+
 ```ruby
 RubyPGExtras.cache_hit
 ```
@@ -29,7 +43,6 @@ RubyPGExtras.cache_hit
 | table hit rate | 0.96724294813466787989 |
 +----------------+------------------------+
 ```
-
 
 By default the ASCII table is displayed, to change to format you need to specify the `in_format` parameter (`[:display_table, :hash, :array, :raw]` options are available):
 
