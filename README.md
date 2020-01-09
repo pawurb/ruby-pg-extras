@@ -1,6 +1,6 @@
 # Ruby PG Extras [![Gem Version](https://badge.fury.io/rb/ruby-pg-extras.svg)](https://badge.fury.io/rb/ruby-pg-extras) [![CircleCI](https://circleci.com/gh/pawurb/ruby-pg-extras.svg?style=svg)](https://circleci.com/gh/pawurb/ruby-pg-extras)
 
-Ruby port of [Heroku PG Extras](https://github.com/heroku/heroku-pg-extras). The goal of this project is to provide a powerful insights into PostgreSQL database for Ruby on Ruby apps that are not using the default Heroku PostgreSQL plugin.
+Ruby port of [Heroku PG Extras](https://github.com/heroku/heroku-pg-extras). The goal of this project is to provide a powerful insights into PostgreSQL database for Ruby apps that are not using the default Heroku PostgreSQL plugin.
 
 Included rake tasks and Ruby methods can be used to obtain information about a Postgres instance, that may be useful when analyzing performance issues. This includes information about locks, index usage, buffer cache hit ratios and vacuum statistics. Ruby API enables developers to easily integrate the tool into e.g. automatic monitoring tasks.
 
