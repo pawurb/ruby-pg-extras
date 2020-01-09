@@ -103,5 +103,3 @@ module RubyPGExtras
 
   private_class_method :connection
 end
-
-require 'ruby-pg-extras/railtie' if defined?(Rails)
