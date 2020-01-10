@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:11.5-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: ruby-pg-extras-test
+      POSTGRES_PASSWORD: secret
+    ports:
+      - '5432:5432'
+    volumes:
+      - ruby_pg_extras_db_data:/var/lib/postgresql/data
+
+volumes:
+  ruby_pg_extras_db_data:
