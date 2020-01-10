@@ -9,8 +9,3 @@ services:
       POSTGRES_PASSWORD: secret
     ports:
       - '5432:5432'
-    volumes:
-      - ruby_pg_extras_db_data:/var/lib/postgresql/data
-
-volumes:
-  ruby_pg_extras_db_data:
