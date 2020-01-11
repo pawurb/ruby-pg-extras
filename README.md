@@ -1,6 +1,6 @@
 # Ruby PG Extras [![Gem Version](https://badge.fury.io/rb/ruby-pg-extras.svg)](https://badge.fury.io/rb/ruby-pg-extras) [![CircleCI](https://circleci.com/gh/pawurb/ruby-pg-extras.svg?style=svg)](https://circleci.com/gh/pawurb/ruby-pg-extras)
 
-Ruby port of [Heroku PG Extras](https://github.com/heroku/heroku-pg-extras). The goal of this project is to provide powerful insights into the PostgreSQL database for Ruby apps that are not using the Heroku PostgreSQL plugin.
+Ruby port of [Heroku PG Extras](https://github.com/heroku/heroku-pg-extras) with several additions and improvements. The goal of this project is to provide powerful insights into the PostgreSQL database for Ruby apps that are not using the Heroku PostgreSQL plugin.
 
 Included rake tasks and Ruby methods can be used to obtain information about a Postgres instance, that may be useful when analyzing performance issues. This includes information about locks, index usage, buffer cache hit ratios and vacuum statistics. Ruby API enables developers to easily integrate the tool into e.g. automatic monitoring tasks.
 
@@ -77,6 +77,38 @@ RubyPGExtras.cache_hit
 
 This command provides information on the efficiency of the buffer cache, for both index reads (`index hit rate`) as well as table reads (`table hit rate`). A low buffer cache hit ratio can be a sign that the Postgres instance is too small for the workload.
 
+#### `index_cache_hit`
+
+```ruby
+
+RubyPGExtras.index_cache_hit
+
+| name                  | buffer_hits | block_reads | total_read | ratio             |
++-----------------------+-------------+-------------+------------+-------------------+
+| teams                 | 187665      | 109         | 187774     | 0.999419514948821 |
+| subscriptions         | 5160        | 6           | 5166       | 0.99883855981417  |
+| plans                 | 5718        | 9           | 5727       | 0.998428496595076 |
+(truncated results for brevity)
+```
+
+The same as `cache_hit` with each table's indexes cache hit info displayed seperately.
+
+#### `table_cache_hit`
+
+```ruby
+
+RubyPGExtras.table_cache_hit
+
+| name                  | buffer_hits | block_reads | total_read | ratio             |
++-----------------------+-------------+-------------+------------+-------------------+
+| plans                 | 32123       | 2           | 32125      | 0.999937743190662 |
+| subscriptions         | 95021       | 8           | 95029      | 0.999915815172211 |
+| teams                 | 171637      | 200         | 171837     | 0.99883610631005  |
+(truncated results for brevity)
+```
+
+The same as `cache_hit` with each table's cache hit info displayed seperately.
+
 #### `index_usage`
 
 ```ruby
@@ -139,10 +171,7 @@ RubyPGExtras.outliers
  SELECT * FROM usage_events WHERE (alp.. | 01:18:10.754354  | 0.6%           | 102,114,301 | 00:00:00
  UPDATE usage_events SET reporter_id =.. | 00:52:35.683254  | 0.4%           | 23,786,348  | 00:00:00
  INSERT INTO usage_events (id, retaine.. | 00:49:24.952561  | 0.4%           | 21,988,201  | 00:00:00
- COPY public.app_ownership_events (id,.. | 00:37:14.31082   | 0.3%           | 13          | 00:12:32.584754
- INSERT INTO app_ownership_events (id,.. | 00:26:59.808212  | 0.2%           | 383,109     | 00:00:00
- SELECT * FROM app_ownership_events   .. | 00:19:06.021846  | 0.1%           | 744,879     | 00:00:00
-(10 rows)
+(truncated results for brevity)
 ```
 
 This command displays statements, obtained from `pg_stat_statements`, ordered by the amount of time to execute in aggregate. This includes the statement itself, the total execution time for that statement, the proportion of total execution time for all statements that statement has taken up, the number of times that statement has been called, and the amount of time that statement spent on synchronous I/O (reading/writing from the filesystem).
@@ -164,10 +193,7 @@ RubyPGExtras.calls
  UPDATE usage_events SET reporter_id =.. | 00:52:35.986167  | 0.4%           | 23,788,388  | 00:00:00
  INSERT INTO usage_events (id, retaine.. | 00:49:25.260245  | 0.4%           | 21,990,326  | 00:00:00
  INSERT INTO usage_events (id, retaine.. | 01:42:59.436532  | 0.8%           | 12,328,187  | 00:00:00
- SELECT * FROM app_ownership_events   .. | 00:19:06.289521  | 0.1%           | 744,976     | 00:00:00
- INSERT INTO app_ownership_events(id, .. | 00:26:59.885631  | 0.2%           | 383,153     | 00:00:00
- UPDATE app_ownership_events SET app_i.. | 00:01:22.282337  | 0.0%           | 359,741     | 00:00:00
-(10 rows)
+(truncated results for brevity)
 ```
 
 This command is much like `pg:outliers`, but ordered by the number of times a statement has been called.
@@ -218,11 +244,6 @@ RubyPGExtras.index_size
  index_attempts_on_enrollment_id                               | 1957 MB
  index_enrollment_attemptables_by_enrollment_activity_id       | 1789 MB
  enrollment_activities_pkey                                    |  458 MB
- index_enrollment_activities_by_lesson_enrollment_and_activity |  402 MB
- index_placement_attempts_on_response_id                       |  109 MB
- index_placement_attempts_on_placement_test_id                 |  108 MB
- index_placement_attempts_on_grade_level_id                    |   97 MB
- index_lesson_enrollments_on_lesson_id                         |   93 MB
 (truncated results for brevity)
 ```
 
@@ -315,14 +336,6 @@ RubyPGExtras.seq_scans
  messages                          |  3922247
  contests_customers                |  2915972
  classroom_goals                   |  2142014
- contests                          |  1370267
- goals                             |  1112659
- districts                         |   158995
- rollup_reports                    |   115942
- customers                         |    93847
- schools                           |    92984
- classrooms                        |    92982
- customer_settings                 |    91226
 (truncated results for brevity)
 ```
 
@@ -378,6 +391,7 @@ RubyPGExtras.bloat
  index | public     | bloated_table::bloated_index  |   3.7 | 34 MB
  table | public     | clean_table                   |   0.2 | 3808 kB
  table | public     | other_clean_table             |   0.3 | 1576 kB
+ (truncated results for brevity)
 ```
 
 This command displays an estimation of table "bloat" – space allocated to a relation that is full of dead tuples, that has yet to be reclaimed. Tables that have a high bloat ratio, typically 10 or greater, should be investigated to see if vacuuming is aggressive enough, and can be a sign of high table churn.
@@ -395,6 +409,7 @@ RubyPGExtras.vacuum_stats
  public | other_table           |             | 2013-04-26 11:41 |             41 |             47 |             58       |
  public | queue_table           |             | 2013-04-26 17:39 |             12 |          8,228 |             52       | yes
  public | picnic_table          |             |                  |             13 |              0 |             53       |
+ (truncated results for brevity)
 ```
 
 This command displays statistics related to vacuum operations for each table, including an estiamtion of dead rows, last autovacuum and the current autovacuum threshold. This command can be useful when determining if current vacuum thresholds require adjustments, and to determine when the table was last vacuumed.
