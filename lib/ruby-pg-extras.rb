@@ -100,6 +100,4 @@ module RubyPGExtras
   def self.database_url
     @@database_url || ENV.fetch("DATABASE_URL")
   end
-
-  private_class_method :connection
 end
