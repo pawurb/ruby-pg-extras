@@ -1,4 +1,4 @@
-/* 10 queries that have longest execution time in aggregate */
+/* 10 queries that have highest frequency of execution */
 
 SELECT query AS qry,
 interval '1 millisecond' * total_time AS exec_time,
