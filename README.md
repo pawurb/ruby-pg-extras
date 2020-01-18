@@ -11,7 +11,7 @@ Are you riding on Rails? Check out the [Rails version](https://github.com/pawurb
 In your Gemfile
 
 ```ruby
-gem 'ruby-pg-extras'
+gem "ruby-pg-extras"
 ```
 
 ### Usage
