@@ -6,7 +6,7 @@ Queries can be used to obtain information about a Postgres instance, that may be
 
 Are you riding on Rails? Check out the [Rails version](https://github.com/pawurb/rails-pg-extras).
 
-### Installation
+## Installation
 
 In your Gemfile
 
@@ -14,7 +14,7 @@ In your Gemfile
 gem "ruby-pg-extras"
 ```
 
-### Usage
+## Usage
 
 Gem expects the `ENV['DATABASE_URL']` value in the following format:
 
@@ -60,9 +60,9 @@ RubyPGExtras.cache_hit(in_format: :raw) =>
  #<PG::Result:0x00007f75777f7328 status=PGRES_TUPLES_OK ntuples=2 nfields=2 cmd_tuples=2>
 ```
 
-### Available methods
+## Available methods
 
-#### `cache_hit`
+### `cache_hit`
 
 ```ruby
 
@@ -77,7 +77,7 @@ RubyPGExtras.cache_hit
 
 This command provides information on the efficiency of the buffer cache, for both index reads (`index hit rate`) as well as table reads (`table hit rate`). A low buffer cache hit ratio can be a sign that the Postgres instance is too small for the workload.
 
-#### `index_cache_hit`
+### `index_cache_hit`
 
 ```ruby
 
@@ -93,7 +93,7 @@ RubyPGExtras.index_cache_hit
 
 The same as `cache_hit` with each table's indexes cache hit info displayed seperately.
 
-#### `table_cache_hit`
+### `table_cache_hit`
 
 ```ruby
 
@@ -109,7 +109,7 @@ RubyPGExtras.table_cache_hit
 
 The same as `cache_hit` with each table's cache hit info displayed seperately.
 
-#### `index_usage`
+### `index_usage`
 
 ```ruby
 
@@ -212,7 +212,7 @@ RubyPGExtras.blocking
 
 This command displays statements that are currently holding locks that other statements are waiting to be released. This can be used in conjunction with `pg:locks` to determine which statements need to be terminated in order to resolve lock contention.
 
-#### `total_index_size`
+### `total_index_size`
 
 ```ruby
 
@@ -341,7 +341,7 @@ RubyPGExtras.seq_scans
 
 This command displays the number of sequential scans recorded against all tables, descending by count of sequential scans. Tables that have very high numbers of sequential scans may be underindexed, and it may be worth investigating queries that read from these tables.
 
-### long_running_queries
+### `long_running_queries`
 
 ```ruby
 
@@ -358,7 +358,7 @@ RubyPGExtras.long_running_queries
 
 This command displays currently running queries, that have been running for longer than 5 minutes, descending by duration. Very long running queries can be a source of multiple issues, such as preventing DDL statements completing or vacuum being unable to update `relfrozenxid`.
 
-### records_rank
+### `records_rank`
 
 ```ruby
 
@@ -377,7 +377,7 @@ RubyPGExtras.records_rank
 
 This command displays an estimated count of rows per table, descending by estimated count. The estimated count is derived from `n_live_tup`, which is updated by vacuum operations. Due to the way `n_live_tup` is populated, sparse vs. dense pages can result in estimations that are significantly out from the real count of rows.
 
-### bloat
+### `bloat`
 
 ```ruby
 
@@ -396,7 +396,7 @@ RubyPGExtras.bloat
 
 This command displays an estimation of table "bloat" – space allocated to a relation that is full of dead tuples, that has yet to be reclaimed. Tables that have a high bloat ratio, typically 10 or greater, should be investigated to see if vacuuming is aggressive enough, and can be a sign of high table churn.
 
-### vacuum_stats
+### `vacuum_stats`
 
 ```ruby
 
@@ -414,7 +414,7 @@ RubyPGExtras.vacuum_stats
 
 This command displays statistics related to vacuum operations for each table, including an estiamtion of dead rows, last autovacuum and the current autovacuum threshold. This command can be useful when determining if current vacuum thresholds require adjustments, and to determine when the table was last vacuumed.
 
-### kill_all
+### `kill_all`
 
 ```ruby
 
@@ -424,7 +424,7 @@ RubyPGExtras.kill_all
 
 This commands kills all the currently active connections to the database. It can be useful as a last resort when your database is stuck in a deadlock.
 
-### mandelbrot
+### `mandelbrot`
 
 ```ruby
 
