@@ -14,7 +14,7 @@ module RubyPGExtras
     long_running_queries mandelbrot outliers
     records_rank seq_scans table_indexes_size
     table_size total_index_size total_table_size
-    unused_indexes vacuum_stats
+    unused_indexes vacuum_stats kill_all
   )
 
   QUERIES.each do |query_name|

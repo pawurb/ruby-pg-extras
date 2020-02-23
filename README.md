@@ -414,6 +414,16 @@ RubyPGExtras.vacuum_stats
 
 This command displays statistics related to vacuum operations for each table, including an estiamtion of dead rows, last autovacuum and the current autovacuum threshold. This command can be useful when determining if current vacuum thresholds require adjustments, and to determine when the table was last vacuumed.
 
+### kill_all
+
+```ruby
+
+RubyPGExtras.kill_all
+
+```
+
+This commands kills all the currently active connections to the database. It can be useful as a last resort when your database is stuck in a deadlock.
+
 ### mandelbrot
 
 ```ruby
