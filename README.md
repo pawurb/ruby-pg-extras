@@ -6,6 +6,8 @@ Queries can be used to obtain information about a Postgres instance, that may be
 
 Are you riding on Rails? Check out the [Rails version](https://github.com/pawurb/rails-pg-extras).
 
+Are you the fan of Elixir and Phoenix? Check out the [ecto_psql_extras](https://github.com/pawurb/ecto_psql_extras).
+
 ## Installation
 
 In your Gemfile
