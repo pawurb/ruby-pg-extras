@@ -16,6 +16,8 @@ In your Gemfile
 gem "ruby-pg-extras"
 ```
 
+Some of the queries (e.g., `calls` and `outliers`) require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension enabled.
+
 ## Usage
 
 Gem expects the `ENV['DATABASE_URL']` value in the following format:
