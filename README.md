@@ -18,6 +18,18 @@ gem "ruby-pg-extras"
 
 Some of the queries (e.g., `calls` and `outliers`) require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension enabled.
 
+You can check if it is enabled in your database by running:
+
+```ruby
+RubyPGExtras.extensions
+```
+You should see the similar line in the output:
+
+```bash
+| pg_stat_statements  | 1.7  | 1.7 | track execution statistics of all SQL statements executed |
+```
+
+
 ## Usage
 
 Gem expects the `ENV['DATABASE_URL']` value in the following format:
@@ -427,6 +439,16 @@ RubyPGExtras.kill_all
 ```
 
 This commands kills all the currently active connections to the database. It can be useful as a last resort when your database is stuck in a deadlock.
+
+### `extensions`
+
+```ruby
+
+RubyPGExtras.extensions
+
+```
+
+This command lists all the currently installed and available PostgreSQL extensions.
 
 ### `mandelbrot`
 
