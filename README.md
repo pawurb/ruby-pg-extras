@@ -6,6 +6,8 @@ Queries can be used to obtain information about a Postgres instance, that may be
 
 Are you riding on Rails? Check out the [Rails version](https://github.com/pawurb/rails-pg-extras).
 
+JavaScript is your thing? There's [NodeJS version](https://github.com/pawurb/node-postgres-extras) available.
+
 Are you the fan of Elixir and Phoenix? Check out the [ecto_psql_extras](https://github.com/pawurb/ecto_psql_extras).
 
 ## Installation
@@ -28,7 +30,6 @@ You should see the similar line in the output:
 ```bash
 | pg_stat_statements  | 1.7  | 1.7 | track execution statistics of all SQL statements executed |
 ```
-
 
 ## Usage
 
