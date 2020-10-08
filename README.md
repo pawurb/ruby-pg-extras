@@ -6,11 +6,15 @@ Queries can be used to obtain information about a Postgres instance, that may be
 
 You can check out this blog post for detailed step by step tutorial on how to [optimize PostgreSQL using PG Extras library](https://pawelurbanek.com/postgresql-fix-performance).
 
-Are you riding on Rails? Check out the [Rails version](https://github.com/pawurb/rails-pg-extras).
+Alternative versions:
 
-JavaScript is your thing? There's [NodeJS version](https://github.com/pawurb/node-postgres-extras) available.
+- [Ruby on Rails](https://github.com/pawurb/rails-pg-extras)
 
-Are you the fan of Elixir and Phoenix? Check out the [ecto_psql_extras](https://github.com/pawurb/ecto_psql_extras).
+- [NodeJS](https://github.com/pawurb/node-postgres-extras)
+
+- [Elixir](https://github.com/pawurb/ecto_psql_extras)
+
+- [Python](https://github.com/pawurb/python-pg-extras)
 
 ## Installation
 
@@ -462,9 +466,3 @@ RubyPGExtras.mandelbrot
 ```
 
 This command outputs the Mandelbrot set, calculated through SQL.
-
-## FAQ
-
-* Does is not violate the Heroku PG Extras license?
-
-The original plugin is MIT based so it means that copying and redistribution in any format is permitted.
