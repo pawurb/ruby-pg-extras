@@ -16,7 +16,7 @@ jobs:
       - run: gem update --system
       - run: gem install bundler
       - run: bundle install --path vendor/bundle
-      - run: sudo apt install postgresql-client
+      - run: sudo apt install postgresql-client-11
       - run: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           name: Run specs
