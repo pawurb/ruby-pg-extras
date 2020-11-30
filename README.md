@@ -16,6 +16,8 @@ Alternative versions:
 
 - [Python](https://github.com/pawurb/python-pg-extras)
 
+- [Haskell](https://github.com/pawurb/haskell-pg-extras)
+
 ## Installation
 
 In your Gemfile
