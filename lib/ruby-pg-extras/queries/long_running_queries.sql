@@ -1,4 +1,4 @@
-/* All queries longer than five minutes by descending duration */
+/* All queries longer than the threshold by descending duration */
 
 SELECT
   pid,
