@@ -9,6 +9,6 @@ FROM
 WHERE
   pg_stat_activity.query <> ''::text
   AND state <> 'idle'
-  AND now() - pg_stat_activity.query_start > interval '5 minutes'
+  AND now() - pg_stat_activity.query_start > interval '%{interval}'
 ORDER BY
   now() - pg_stat_activity.query_start DESC;

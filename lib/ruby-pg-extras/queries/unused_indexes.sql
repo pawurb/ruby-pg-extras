@@ -11,6 +11,6 @@ SELECT
   idx_scan as index_scans
 FROM pg_stat_user_indexes ui
 JOIN pg_index i ON ui.indexrelid = i.indexrelid
-WHERE NOT indisunique AND idx_scan < 50 AND pg_relation_size(relid) > 5 * 8192
+WHERE NOT indisunique AND idx_scan < %{min_scans} AND pg_relation_size(relid) > 5 * 8192
 ORDER BY pg_relation_size(i.indexrelid) / nullif(idx_scan, 0) DESC NULLS FIRST,
 pg_relation_size(i.indexrelid) DESC;

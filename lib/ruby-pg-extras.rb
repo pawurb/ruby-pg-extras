@@ -17,19 +17,30 @@ module RubyPGExtras
     unused_indexes vacuum_stats kill_all
   )
 
+  DEFAULT_ARGS = Hash.new({}).merge({
+    calls: { limit: 10 },
+    long_running_queries: { interval: '5 seconds' },
+    outliers: { limit: 10 },
+    unused_indexes: { min_scans: 50 }
+  })
+
   QUERIES.each do |query_name|
-    define_singleton_method query_name do |options = { in_format: :display_table }|
+    define_singleton_method query_name do |options = {}|
       run_query(
         query_name: query_name,
-        in_format: options.fetch(:in_format)
+        in_format: options.fetch(:in_format, :display_table),
+        args: options.fetch(:args, {})
       )
     end
   end
 
-  def self.run_query(query_name:, in_format:)
-    result = connection.exec(
+  def self.run_query(query_name:, in_format:, args: {})
+    sql = if (custom_args = DEFAULT_ARGS[query_name].merge(args)) != {}
+      sql_for(query_name: query_name) % custom_args
+    else
       sql_for(query_name: query_name)
-    )
+    end
+    result = connection.exec(sql)
 
     display_result(
       result,
