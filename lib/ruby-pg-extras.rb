@@ -19,7 +19,7 @@ module RubyPGExtras
 
   DEFAULT_ARGS = Hash.new({}).merge({
     calls: { limit: 10 },
-    long_running_queries: { interval: '5 seconds' },
+    long_running_queries: { threshold: "500 milliseconds" },
     outliers: { limit: 10 },
     unused_indexes: { min_scans: 50 }
   })
