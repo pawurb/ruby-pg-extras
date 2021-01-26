@@ -85,6 +85,13 @@ RubyPGExtras.cache_hit(in_format: :raw) =>
  #<PG::Result:0x00007f75777f7328 status=PGRES_TUPLES_OK ntuples=2 nfields=2 cmd_tuples=2>
 ```
 
+Some methods accept an optional `args` param allowing you to customize queries:
+
+```ruby
+RubyPGExtras.long_running_queries(args: { threshold: "200 milliseconds" })
+
+```
+
 ## Available methods
 
 ### `cache_hit`
@@ -185,7 +192,7 @@ This command displays all the current locks, regardless of their type.
 
 ```ruby
 
-RubyPGExtras.outliers
+RubyPGExtras.outliers(args: { limit: 20 })
 
                    qry                   |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
 -----------------------------------------+------------------+----------------+-------------+--------------
@@ -207,7 +214,7 @@ Typically, an efficient query will have an appropriate ratio of calls to total e
 
 ```ruby
 
-RubyPGExtras.calls
+RubyPGExtras.calls(args: { limit: 10 })
 
                    qry                   |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
 -----------------------------------------+------------------+----------------+-------------+--------------
@@ -332,7 +339,7 @@ This command displays the total size of each table and materialized view in the 
 
 ```ruby
 
-RubyPGExtras.unused_indexes
+RubyPGExtras.unused_indexes(args: { min_scans: 20 })
 
           table      |                       index                | index_size | index_scans
 ---------------------+--------------------------------------------+------------+-------------
