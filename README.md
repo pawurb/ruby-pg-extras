@@ -355,7 +355,7 @@ This command displays indexes that have < 50 scans recorded against them, and ar
 
 ```ruby
 
-RubyPGExtras.null_indexes
+RubyPGExtras.null_indexes(args: { min_relation_size_mb: 10 })
 
    oid   |         index      | index_size | unique | indexed_column | null_frac | expected_saving
 ---------+--------------------+------------+--------+----------------+-----------+-----------------
@@ -393,7 +393,7 @@ This command displays the number of sequential scans recorded against all tables
 
 ```ruby
 
-RubyPGExtras.long_running_queries
+RubyPGExtras.long_running_queries(args: { threshold: "200 milliseconds" })
 
 
   pid  |    duration     |                                      query

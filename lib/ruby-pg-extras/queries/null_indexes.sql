@@ -1,4 +1,5 @@
 /* Find indexes with a high ratio of NULL values */
+
 SELECT
     c.oid,
     c.relname AS index,
@@ -7,7 +8,7 @@ SELECT
     a.attname AS indexed_column,
     CASE s.null_frac
         WHEN 0 THEN ''
-        ELSE to_char(s.null_frac * 100, '999.00%')
+        ELSE to_char(s.null_frac * 100, '999.00%%')
     END AS null_frac,
     pg_size_pretty((pg_relation_size(c.oid) * s.null_frac)::bigint) AS expected_saving
 FROM
