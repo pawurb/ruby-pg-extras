@@ -1,4 +1,4 @@
-/* Find indexed columns with high null_frac */
+/* Find indexes with a high ratio of NULL values */
 SELECT
     c.oid,
     c.relname AS index,
@@ -26,7 +26,7 @@ WHERE
     AND array_length(i.indkey, 1) = 1
     -- Exclude indexes without null_frac ratio
     AND coalesce(s.null_frac, 0) != 0
-    -- Larger than 10MB
-    AND pg_relation_size(c.oid) > 10 * 1024 ^ 2
+    -- Larger than threshold
+    AND pg_relation_size(c.oid) > %{min_relation_size_mb} * 1024 ^ 2
 ORDER BY
   pg_relation_size(c.oid) * s.null_frac DESC;
