@@ -365,7 +365,7 @@ RubyPGExtras.null_indexes(args: { min_relation_size_mb: 10 })
 
 ```
 
-This commands displays indexes that contain `NULL` values. A high ratio of `NULL` values means that using a partial index excluding them will be beneficial in case they are not used for searching. [Source and more info](https://hakibenita.com/postgresql-unused-index-size).
+This command displays indexes that contain `NULL` values. A high ratio of `NULL` values means that using a partial index excluding them will be beneficial in case they are not used for searching.
 
 ### `seq_scans`
 
