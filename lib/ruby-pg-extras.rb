@@ -10,7 +10,7 @@ module RubyPGExtras
   QUERIES = %i(
     bloat blocking cache_hit
     calls extensions table_cache_hit index_cache_hit
-    index_size index_usage locks all_locks
+    index_size index_usage null_indexes locks all_locks
     long_running_queries mandelbrot outliers
     records_rank seq_scans table_indexes_size
     table_size total_index_size total_table_size
