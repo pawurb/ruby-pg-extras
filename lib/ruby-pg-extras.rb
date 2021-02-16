@@ -8,7 +8,7 @@ module RubyPGExtras
   @@database_url = nil
 
   QUERIES = %i(
-    bloat blocking cache_hit
+    bloat blocking cache_hit db_settings
     calls extensions table_cache_hit index_cache_hit
     index_size index_usage null_indexes locks all_locks
     long_running_queries mandelbrot outliers
