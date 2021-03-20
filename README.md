@@ -533,3 +533,19 @@ RubyPGExtras.mandelbrot
 ```
 
 This command outputs the Mandelbrot set, calculated through SQL.
+
+### `buffercache_stats`
+
+This command show you the relations buffered in database share buffer, ordered by relation percentage taken in shared buffer. It also shows that how much of the whole relation is buffered.
+
+```ruby
+RubyPGExtras.buffercache_stats
+```
+
+### `buffercache_usage`
+
+This command show you the top relation in cache.
+
+```ruby
+RubyPGExtras.buffercache_usage
+```
