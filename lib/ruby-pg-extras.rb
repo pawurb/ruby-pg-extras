@@ -22,6 +22,8 @@ module RubyPGExtras
     calls: { limit: 10 },
     long_running_queries: { threshold: "500 milliseconds" },
     outliers: { limit: 10 },
+    buffercache_stats: { limit: 10 },
+    buffercache_usage: { limit: 20 },
     unused_indexes: { min_scans: 50 },
     null_indexes: { min_relation_size_mb: 10 }
   })

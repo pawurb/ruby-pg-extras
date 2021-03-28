@@ -1,7 +1,9 @@
-select c.relname,count(*) as buffers
-from pg_class c
-inner join pg_buffercache b on b.relfilenode = c.relfilenode
-inner join pg_database d on (b.reldatabase = d.oid and d.datname = current_database())
-group by c.relname
-order by 2 desc
-limit 20;
+/* Calculate how many blocks from which table are currently cached */
+
+SELECT c.relname, count(*) AS buffers
+FROM pg_class c
+INNER JOIN pg_buffercache b ON b.relfilenode = c.relfilenode
+INNER JOIN pg_database d ON (b.reldatabase = d.oid AND d.datname = current_database())
+GROUP BY c.relname
+ORDER BY 2 DESC
+LIMIT %{limit};
