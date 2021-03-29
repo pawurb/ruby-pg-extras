@@ -15,12 +15,15 @@ module RubyPGExtras
     records_rank seq_scans table_indexes_size
     table_size total_index_size total_table_size
     unused_indexes vacuum_stats kill_all
+    buffercache_stats buffercache_usage
   )
 
   DEFAULT_ARGS = Hash.new({}).merge({
     calls: { limit: 10 },
     long_running_queries: { threshold: "500 milliseconds" },
     outliers: { limit: 10 },
+    buffercache_stats: { limit: 10 },
+    buffercache_usage: { limit: 20 },
     unused_indexes: { min_scans: 50 },
     null_indexes: { min_relation_size_mb: 10 }
   })
