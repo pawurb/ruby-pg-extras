@@ -3,6 +3,10 @@
 require 'spec_helper'
 
 describe RubyPGExtras do
+  before(:all) do
+    RubyPGExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS pg_buffercache;")
+  end
+
   RubyPGExtras::QUERIES.each do |query_name|
     it "#{query_name} description can be read" do
       expect do
