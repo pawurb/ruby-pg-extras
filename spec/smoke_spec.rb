@@ -5,6 +5,7 @@ require 'spec_helper'
 describe RubyPGExtras do
   before(:all) do
     RubyPGExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS pg_buffercache;")
+    RubyPGExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS pg_stat_statements;")
   end
 
   RubyPGExtras::QUERIES.each do |query_name|
@@ -17,9 +18,7 @@ describe RubyPGExtras do
     end
   end
 
-  PG_STATS_DEPENDENT_QUERIES = %i(calls outliers)
-
-  (RubyPGExtras::QUERIES - PG_STATS_DEPENDENT_QUERIES).each do |query_name|
+  RubyPGExtras::QUERIES.each do |query_name|
     it "#{query_name} query can be executed" do
       expect do
         RubyPGExtras.run_query(
