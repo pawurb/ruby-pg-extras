@@ -6,6 +6,7 @@ require 'pg'
 
 module RubyPGExtras
   @@database_url = nil
+  NEW_PG_STAT_STATEMENTS = "1.8"
 
   QUERIES = %i(
     bloat blocking cache_hit db_settings
@@ -20,8 +21,10 @@ module RubyPGExtras
 
   DEFAULT_ARGS = Hash.new({}).merge({
     calls: { limit: 10 },
+    calls_legacy: { limit: 10 },
     long_running_queries: { threshold: "500 milliseconds" },
     outliers: { limit: 10 },
+    outliers_legacy: { limit: 10 },
     buffercache_stats: { limit: 10 },
     buffercache_usage: { limit: 20 },
     unused_indexes: { min_scans: 50 },
@@ -39,6 +42,16 @@ module RubyPGExtras
   end
 
   def self.run_query(query_name:, in_format:, args: {})
+    if %i(calls outliers).include?(query_name)
+      pg_stat_statements_ver = RubyPGExtras.connection.exec("select installed_version from pg_available_extensions where name='pg_stat_statements'")
+        .to_a[0].fetch("installed_version", nil)
+      if pg_stat_statements_ver != nil
+        if Gem::Version.new(pg_stat_statements_ver) < Gem::Version.new(NEW_PG_STAT_STATEMENTS)
+          query_name = "#{query_name}_legacy".to_sym
+        end
+      end
+    end
+
     sql = if (custom_args = DEFAULT_ARGS[query_name].merge(args)) != {}
       sql_for(query_name: query_name) % custom_args
     else
