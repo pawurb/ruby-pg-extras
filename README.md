@@ -387,6 +387,19 @@ This command displays indexes that have < 50 scans recorded against them, and ar
 
 [More info](https://pawelurbanek.com/postgresql-fix-performance#unused-indexes)
 
+### `duplicate_indexes`
+
+```ruby
+
+RubyPGExtras.duplicate_indexes
+
+| size       |  idx1        |  idx2          |  idx3    |  idx4     |
++------------+--------------+----------------+----------+-----------+
+| 128 k      | users_pkey   | index_users_id |          |           |
+```
+
+This command displays multiple indexes that have the same set of columns, same opclass, expression and predicate - which make them equivalent. Usually it's safe to drop one of them.
+
 ### `null_indexes`
 
 ```ruby
@@ -563,3 +576,4 @@ rake test_all
 - [https://github.com/heroku/heroku-pg-extras](https://github.com/heroku/heroku-pg-extras)
 - [https://hakibenita.com/postgresql-unused-index-size](https://hakibenita.com/postgresql-unused-index-size)
 - [https://sites.google.com/site/itmyshare/database-tips-and-examples/postgres/useful-sqls-to-check-contents-of-postgresql-shared_buffer](https://sites.google.com/site/itmyshare/database-tips-and-examples/postgres/useful-sqls-to-check-contents-of-postgresql-shared_buffer)
+- [https://wiki.postgresql.org/wiki/Index_Maintenance](https://wiki.postgresql.org/wiki/Index_Maintenance)
