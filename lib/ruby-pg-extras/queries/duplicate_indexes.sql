@@ -1,4 +1,4 @@
-/* Multiple indexes that have the same set of columns, same opclass, expression and predicate -- which make them equivalent. */
+/* Multiple indexes that have the same set of columns, same opclass, expression and predicate. */
 
 SELECT pg_size_pretty(sum(pg_relation_size(idx))::bigint) as size,
        (array_agg(idx))[1] as idx1, (array_agg(idx))[2] as idx2,
