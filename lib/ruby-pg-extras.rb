@@ -16,7 +16,7 @@ module RubyPGExtras
     records_rank seq_scans table_indexes_size
     table_size total_index_size total_table_size
     unused_indexes duplicate_indexes vacuum_stats kill_all
-    buffercache_stats buffercache_usage
+    buffercache_stats buffercache_usage ssl_used
   )
 
   DEFAULT_ARGS = Hash.new({}).merge({
