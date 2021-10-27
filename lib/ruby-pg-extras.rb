@@ -3,13 +3,15 @@
 require 'terminal-table'
 require 'uri'
 require 'pg'
+require 'ruby-pg-extras/diagnose_data'
+require 'ruby-pg-extras/diagnose_print'
 
 module RubyPGExtras
   @@database_url = nil
   NEW_PG_STAT_STATEMENTS = "1.8"
 
   QUERIES = %i(
-    bloat blocking cache_hit db_settings
+    add_extensions bloat blocking cache_hit db_settings
     calls extensions table_cache_hit index_cache_hit
     index_size index_usage null_indexes locks all_locks
     long_running_queries mandelbrot outliers
@@ -28,7 +30,7 @@ module RubyPGExtras
     outliers_legacy: { limit: 10 },
     buffercache_stats: { limit: 10 },
     buffercache_usage: { limit: 20 },
-    unused_indexes: { min_scans: 50 },
+    unused_indexes: { max_scans: 50 },
     null_indexes: { min_relation_size_mb: 10 }
   })
 
@@ -65,6 +67,18 @@ module RubyPGExtras
       title: description_for(query_name: query_name),
       in_format: in_format
     )
+  end
+
+  def self.diagnose(in_format: :display_table)
+    data = RubyPGExtras::DiagnoseData.call
+
+    if in_format == :display_table
+      RubyPGExtras::DiagnosePrint.call(data)
+    elsif in_format == :hash
+      data
+    else
+      raise "Invalid 'in_format' argument!"
+    end
   end
 
   def self.display_result(result, title:, in_format:)

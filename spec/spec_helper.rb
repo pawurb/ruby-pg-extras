@@ -17,3 +17,11 @@ else
 end
 
 ENV["DATABASE_URL"] ||= "postgresql://postgres:secret@localhost:#{port}/ruby-pg-extras-test"
+
+RSpec.configure do |config|
+  config.before(:suite) do
+    RubyPGExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS pg_stat_statements;")
+    RubyPGExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS pg_buffercache;")
+    RubyPGExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS sslinfo;")
+  end
+end

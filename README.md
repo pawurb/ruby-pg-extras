@@ -26,7 +26,7 @@ In your Gemfile
 gem "ruby-pg-extras"
 ```
 
-Some of the queries (e.g., `calls` and `outliers`) require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension enabled.
+`calls` and `outliers` queries require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension.
 
 You can check if it is enabled in your database by running:
 
@@ -37,6 +37,12 @@ You should see the similar line in the output:
 
 ```bash
 | pg_stat_statements  | 1.7  | 1.7 | track execution statistics of all SQL statements executed |
+```
+
+`ssl_used` requires `sslinfo` extension, and `buffercache_usage`/`buffercache_usage` queries need `pg_buffercache`. You can enable them all by running:
+
+```ruby
+RubyPGExtras.add_extensions
 ```
 
 ## Usage
@@ -91,6 +97,18 @@ Some methods accept an optional `args` param allowing you to customize queries:
 RubyPGExtras.long_running_queries(args: { threshold: "200 milliseconds" })
 
 ```
+
+## Diagnose report
+
+The simplest way to start using pg-extras is to execute a `diagnose` method. It runs a set of checks and prints out a report highlighting areas that may require additional investigation:
+
+```ruby
+RubyPGExtras.diagnose
+```
+
+![Diagnose report](https://github.com/pawurb/ruby-pg-extras/raw/master/ruby-pg-extras-diagnose.png)
+
+Keep reading to learn about methods that `diagnose` uses under the hood.
 
 ## Available methods
 
@@ -236,7 +254,7 @@ This command displays all the current locks, regardless of their type.
 
 RubyPGExtras.outliers(args: { limit: 20 })
 
-                   qry                   |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
+                   query                 |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
 -----------------------------------------+------------------+----------------+-------------+--------------
  SELECT * FROM archivable_usage_events.. | 154:39:26.431466 | 72.2%          | 34,211,877  | 00:00:00
  COPY public.archivable_usage_events (.. | 50:38:33.198418  | 23.6%          | 13          | 13:34:21.00108
@@ -387,7 +405,7 @@ This command displays the total size of each table and materialized view in the 
 
 ```ruby
 
-RubyPGExtras.unused_indexes(args: { min_scans: 20 })
+RubyPGExtras.unused_indexes(args: { max_scans: 20 })
 
           table      |                       index                | index_size | index_scans
 ---------------------+--------------------------------------------+------------+-------------
