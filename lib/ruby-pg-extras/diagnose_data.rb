@@ -100,7 +100,7 @@ module RubyPGExtras
     end
 
     def ssl_used
-      ssl_connection = query_module.ssl_used(in_format: :hash)[0].fetch("ssl_is_used") == "t"
+      ssl_connection = query_module.ssl_used(in_format: :hash)[0].fetch("ssl_is_used")
 
       if ssl_connection
         {
