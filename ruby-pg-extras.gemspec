@@ -18,7 +18,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency "pg"
   gem.add_dependency "filesize"
   gem.add_dependency "terminal-table"
-  gem.add_dependency "colorize"
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rspec"
 end

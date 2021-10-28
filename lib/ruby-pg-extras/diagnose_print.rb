@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'colorize'
 require 'terminal-table'
 
 module RubyPGExtras
@@ -19,8 +18,8 @@ module RubyPGExtras
         color = val.fetch(:ok) ? :green : :red
 
         [
-          "[#{symbol}] - #{key}".colorize(color),
-          val.fetch(:message).colorize(color)
+          colorize("[#{symbol}] - #{key}", color),
+          colorize(val.fetch(:message), color)
         ]
       end
 
@@ -34,6 +33,16 @@ module RubyPGExtras
 
     def title
       "ruby-pg-extras - diagnose report"
+    end
+
+    def colorize(string, color)
+      if color == :red
+        "\e[0;31;49m#{string}\e[0m"
+      elsif color == :green
+        "\e[0;32;49m#{string}\e[0m"
+      else
+        raise "Unsupported color: #{color}"
+      end
     end
   end
 end
