@@ -89,7 +89,7 @@ module RubyPGExtras
       if index_cache_hit_ratio > min_expected
         {
           ok: true,
-          message: "Index hit ratio is correct: #{table_cache_hit_ratio}."
+          message: "Index hit ratio is correct: #{index_cache_hit_ratio}."
         }
       else
         {

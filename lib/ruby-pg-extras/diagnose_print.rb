@@ -33,7 +33,7 @@ module RubyPGExtras
     private
 
     def title
-      "rails-pg-extras - diagnose report"
+      "ruby-pg-extras - diagnose report"
     end
   end
 end
