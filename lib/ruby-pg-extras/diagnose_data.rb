@@ -18,14 +18,14 @@ module RubyPGExtras
     end
 
     def call
-      {
-        table_cache_hit: table_cache_hit,
-        index_cache_hit: index_cache_hit,
-        unused_indexes: unused_indexes,
-        null_indexes: null_indexes,
-        bloat: bloat,
-        duplicate_indexes: duplicate_indexes
-      }.yield_self do |checks|
+      [
+        :table_cache_hit,
+        :index_cache_hit,
+        :unused_indexes,
+        :null_indexes,
+        :bloat,
+        :duplicate_indexes
+      ].yield_self do |checks|
         extensions_data = query_module.extensions(in_format: :hash)
         pg_stats_enabled = extensions_data.find do |el|
           el.fetch("name") == "pg_stat_statements"
@@ -36,18 +36,16 @@ module RubyPGExtras
         end.fetch("installed_version", false)
 
         if pg_stats_enabled
-          checks.merge!({
-            outliers: outliers
-          })
+          checks = checks.concat([:outliers])
         end
 
         if ssl_info_enabled
-          checks.merge!({
-            ssl_used: ssl_used
-          })
+          checks = checks.concat([:ssl_used])
         end
 
         checks
+      end.map do |check|
+        send(check).merge(check_name: check)
       end
     end
 

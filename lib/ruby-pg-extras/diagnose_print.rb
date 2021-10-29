@@ -9,17 +9,16 @@ module RubyPGExtras
     end
 
     def call(data)
-      rows = data.sort do |key|
-        key[1].fetch(:ok) ? 1 : -1
+      rows = data.sort do |el|
+        p el
+        el.fetch(:ok) ? 1 : -1
       end.map do |el|
-        key = el[0]
-        val = el[1]
-        symbol = val.fetch(:ok) ? "√" : "x"
-        color = val.fetch(:ok) ? :green : :red
+        symbol = el.fetch(:ok) ? "√" : "x"
+        color = el.fetch(:ok) ? :green : :red
 
         [
-          colorize("[#{symbol}] - #{key}", color),
-          colorize(val.fetch(:message), color)
+          colorize("[#{symbol}] - #{el.fetch(:check_name)}", color),
+          colorize(el.fetch(:message), color)
         ]
       end
 

@@ -76,6 +76,8 @@ module RubyPGExtras
       RubyPGExtras::DiagnosePrint.call(data)
     elsif in_format == :hash
       data
+    elsif in_format == :array
+      data.map(&:values)
     else
       raise "Invalid 'in_format' argument!"
     end
