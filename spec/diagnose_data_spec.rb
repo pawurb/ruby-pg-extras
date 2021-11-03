@@ -20,9 +20,9 @@ describe RubyPGExtras::DiagnoseData do
 
         expect(RubyPGExtras).to receive(:null_indexes) {
           [
-            { "oid" => 123, "index" => "index_plans_on_payer_id", "index_size" => "16 MB", "unique" => "t", "null_frac" => "00.00%", "expected_saving" => "0 kb" },
-            { "oid" => 321, "index" => "index_feedbacks_on_target_id", "index_size" => "80 kB", "unique" => "f", "null_frac" => "97.00%", "expected_saving" => "77 kb" },
-            { "oid" => 231, "index" => "index_channels_on_slack_id", "index_size" => "56 MB", "unique" => "t", "null_frac" => "49.99%", "expected_saving" => "28 MB" }
+            { "oid" => 123, "index" => "index_plans_on_payer_id", "index_size" => "16 MB", "unique" => true, "null_frac" => "00.00%", "expected_saving" => "0 kb" },
+            { "oid" => 321, "index" => "index_feedbacks_on_target_id", "index_size" => "80 kB", "unique" => true, "null_frac" => "97.00%", "expected_saving" => "77 kb" },
+            { "oid" => 231, "index" => "index_channels_on_slack_id", "index_size" => "56 MB", "unique" => true, "null_frac" => "49.99%", "expected_saving" => "28 MB" }
           ]
         }
 
