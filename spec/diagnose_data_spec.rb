@@ -55,17 +55,6 @@ describe RubyPGExtras::DiagnoseData do
     end
 
     context "real database data" do
-      before do
-        expect(RubyPGExtras).to receive(:unused_indexes) {
-          [
-            { "table" => "public.plans", "index" => "index_plans_on_payer_id", "index_size" => "2 MB", "index_scans" => 0 },
-            { "table" => "public.feedbacks", "index" => "index_feedbacks_on_target_id", "index_size" => "80 kB", "index_scans" => 1 },
-            { "table" => "public.channels", "index" => "index_channels_on_slack_id", "index_size" => "1.1 MB", "index_scans" => 7}
-          ]
-        }
-
-      end
-
       it "works" do
         expect {
           RubyPGExtras::DiagnosePrint.call(result)

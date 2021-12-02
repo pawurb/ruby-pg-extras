@@ -5,6 +5,10 @@ require 'uri'
 require 'pg'
 require 'ruby-pg-extras/diagnose_data'
 require 'ruby-pg-extras/diagnose_print'
+require 'ruby-pg-extras/index_info'
+require 'ruby-pg-extras/index_info_print'
+require 'ruby-pg-extras/table_info'
+require 'ruby-pg-extras/table_info_print'
 
 module RubyPGExtras
   @@database_url = nil
@@ -12,10 +16,10 @@ module RubyPGExtras
 
   QUERIES = %i(
     add_extensions bloat blocking cache_hit db_settings
-    calls extensions table_cache_hit index_cache_hit
-    index_size index_usage null_indexes locks all_locks
+    calls extensions table_cache_hit tables index_cache_hit
+    indexes index_size index_usage index_scans null_indexes locks all_locks
     long_running_queries mandelbrot outliers
-    records_rank seq_scans table_indexes_size
+    records_rank seq_scans table_index_scans table_indexes_size
     table_size total_index_size total_table_size
     unused_indexes duplicate_indexes vacuum_stats kill_all
     pg_stat_statements_reset buffercache_stats
@@ -74,6 +78,34 @@ module RubyPGExtras
 
     if in_format == :display_table
       RubyPGExtras::DiagnosePrint.call(data)
+    elsif in_format == :hash
+      data
+    elsif in_format == :array
+      data.map(&:values)
+    else
+      raise "Invalid 'in_format' argument!"
+    end
+  end
+
+  def self.index_info(args:, in_format: :display_table)
+    data = RubyPGExtras::IndexInfo.call(args[:table_name])
+
+    if in_format == :display_table
+      RubyPGExtras::IndexInfoPrint.call(data)
+    elsif in_format == :hash
+      data
+    elsif in_format == :array
+      data.map(&:values)
+    else
+      raise "Invalid 'in_format' argument!"
+    end
+  end
+
+  def self.table_info(args:, in_format: :display_table)
+    data = RubyPGExtras::TableInfo.call(args[:table_name])
+
+    if in_format == :display_table
+      RubyPGExtras::TableInfoPrint.call(data)
     elsif in_format == :hash
       data
     elsif in_format == :array
