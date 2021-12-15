@@ -87,7 +87,7 @@ module RubyPGExtras
     end
   end
 
-  def self.index_info(args:, in_format: :display_table)
+  def self.index_info(args: {}, in_format: :display_table)
     data = RubyPGExtras::IndexInfo.call(args[:table_name])
 
     if in_format == :display_table
@@ -101,7 +101,7 @@ module RubyPGExtras
     end
   end
 
-  def self.table_info(args:, in_format: :display_table)
+  def self.table_info(args: {}, in_format: :display_table)
     data = RubyPGExtras::TableInfo.call(args[:table_name])
 
     if in_format == :display_table

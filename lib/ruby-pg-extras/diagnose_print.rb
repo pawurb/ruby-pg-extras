@@ -10,7 +10,6 @@ module RubyPGExtras
 
     def call(data)
       rows = data.sort do |el|
-        p el
         el.fetch(:ok) ? 1 : -1
       end.map do |el|
         symbol = el.fetch(:ok) ? "√" : "x"

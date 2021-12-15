@@ -11,10 +11,13 @@ module RubyPGExtras
         else
           index_data.fetch("tablename") == table_name
         end
+      end.sort_by do |index_data|
+        index_data.fetch("tablename")
       end.map do |index_data|
         index_name = index_data.fetch("indexname")
+
         {
-          index_name: index_data.fetch("indexname"),
+          index_name: index_name,
           table_name: index_data.fetch("tablename"),
           columns: index_data.fetch("columns").split(',').map(&:strip),
           index_size: index_size_data.find do |el|

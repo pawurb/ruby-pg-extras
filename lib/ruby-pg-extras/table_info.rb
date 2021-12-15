@@ -11,6 +11,8 @@ module RubyPGExtras
         else
           table_data.fetch("tablename") == table_name
         end
+      end.sort_by do |table_data|
+        table_data.fetch("tablename")
       end.map do |table_data|
         table_name = table_data.fetch("tablename")
 
