@@ -28,7 +28,7 @@ module RubyPGExtras
           "Table cache hit",
           "Indexes cache hit",
           "Estimated rows",
-          "Sequentail scans",
+          "Sequential scans",
           "Indexes scans"
         ],
         title: title,
