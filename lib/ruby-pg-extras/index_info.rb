@@ -28,7 +28,7 @@ module RubyPGExtras
           end.fetch("index_scans", "N/A"),
           null_frac: null_indexes_data.find do |el|
             el.fetch("index") == index_name
-          end&.fetch("null_frac", "N/A").strip || "0.00%"
+          end&.fetch("null_frac", "N/A")&.strip || "0.00%"
         }
       end
     end
