@@ -118,7 +118,7 @@ module RubyPGExtras
         in_format: :hash,
         args: { min_scans: PG_EXTRAS_UNUSED_INDEXES_MAX_SCANS }
       ).select do |i|
-        Filesize.from(i.fetch("index_size")).to_i >= PG_EXTRAS_UNUSED_INDEXES_MIN_SIZE_BYTES
+        Filesize.from(i.fetch("index_size").sub("bytes", "").strip).to_i >= PG_EXTRAS_UNUSED_INDEXES_MIN_SIZE_BYTES
       end
 
       if indexes.count == 0
