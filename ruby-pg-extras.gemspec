@@ -3,21 +3,25 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'ruby-pg-extras/version'
 
-Gem::Specification.new do |gem|
-  gem.name          = "ruby-pg-extras"
-  gem.version       = RubyPGExtras::VERSION
-  gem.authors       = ["pawurb"]
-  gem.email         = ["contact@pawelurbanek.com"]
-  gem.summary       = %q{ Ruby PostgreSQL performance database insights }
-  gem.description   = %q{ Ruby port of Heroku PG Extras. The goal of this project is to provide a powerful insights into PostgreSQL database for Ruby on Rails apps that are not using the default Heroku PostgreSQL plugin. }
-  gem.homepage      = "http://github.com/pawurb/ruby-pg-extras"
-  gem.files         = `git ls-files`.split("\n")
-  gem.test_files    = gem.files.grep(%r{^(spec)/})
-  gem.require_paths = ["lib"]
-  gem.license       = "MIT"
-  gem.add_dependency "pg"
-  gem.add_dependency "filesize"
-  gem.add_dependency "terminal-table"
-  gem.add_development_dependency "rake"
-  gem.add_development_dependency "rspec"
+Gem::Specification.new do |s|
+  s.name          = "ruby-pg-extras"
+  s.version       = RubyPGExtras::VERSION
+  s.authors       = ["pawurb"]
+  s.email         = ["contact@pawelurbanek.com"]
+  s.summary       = %q{ Ruby PostgreSQL performance database insights }
+  s.description   = %q{ Ruby port of Heroku PG Extras. The goal of this project is to provide a powerful insights into PostgreSQL database for Ruby on Rails apps that are not using the default Heroku PostgreSQL plugin. }
+  s.homepage      = "http://github.com/pawurb/ruby-pg-extras"
+  s.files         = `git ls-files`.split("\n")
+  s.test_files    = s.files.grep(%r{^(spec)/})
+  s.require_paths = ["lib"]
+  s.license       = "MIT"
+  s.add_dependency "pg"
+  s.add_dependency "filesize"
+  s.add_dependency "terminal-table"
+  s.add_development_dependency "rake"
+  s.add_development_dependency "rspec"
+
+  if s.respond_to?(:metadata=)
+    s.metadata = { "rubygems_mfa_required" => "true" }
+  end
 end
