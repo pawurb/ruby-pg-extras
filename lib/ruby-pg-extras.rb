@@ -159,15 +159,7 @@ module RubyPGExtras
   end
 
   def self.connection
-    database_uri = URI.parse(database_url)
-
-    @_connection ||= PG.connect(
-      dbname: database_uri.path[1..-1],
-      host: database_uri.host,
-      port: database_uri.port,
-      user: database_uri.user,
-      password: database_uri.password
-    )
+    @_connection ||= PG.connect(database_url)
   end
 
   def self.database_url=(value)
