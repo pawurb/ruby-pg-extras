@@ -1,4 +1,4 @@
-module RubyPGExtras
+module RubyPgExtras
   class TableInfo
     def self.call(table_name = nil)
       new.call(table_name)
@@ -71,7 +71,7 @@ module RubyPGExtras
     end
 
     def query_module
-      RubyPGExtras
+      RubyPgExtras
     end
   end
 end

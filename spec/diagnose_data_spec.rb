@@ -2,15 +2,15 @@
 
 require 'spec_helper'
 
-describe RubyPGExtras::DiagnoseData do
+describe RubyPgExtras::DiagnoseData do
   subject(:result) do
-    RubyPGExtras::DiagnoseData.call
+    RubyPgExtras::DiagnoseData.call
   end
 
   describe "call" do
     context "stubbed cases" do
       before do
-        expect(RubyPGExtras).to receive(:unused_indexes) {
+        expect(RubyPgExtras).to receive(:unused_indexes) {
           [
             { "table" => "public.plans", "index" => "index_plans_on_payer_id", "index_size" => "16 MB", "index_scans" => 0 },
             { "table" => "public.feedbacks", "index" => "index_feedbacks_on_target_id", "index_size" => "111180 bytes", "index_scans" => 1 },
@@ -18,7 +18,7 @@ describe RubyPGExtras::DiagnoseData do
           ]
         }
 
-        expect(RubyPGExtras).to receive(:null_indexes) {
+        expect(RubyPgExtras).to receive(:null_indexes) {
           [
             { "oid" => 123, "index" => "index_plans_on_payer_id", "index_size" => "16 MB", "unique" => true, "null_frac" => "00.00%", "expected_saving" => "0 kb" },
             { "oid" => 321, "index" => "index_feedbacks_on_target_id", "index_size" => "80 kB", "unique" => true, "null_frac" => "97.00%", "expected_saving" => "77 kb" },
@@ -26,7 +26,7 @@ describe RubyPGExtras::DiagnoseData do
           ]
         }
 
-        expect(RubyPGExtras).to receive(:bloat) {
+        expect(RubyPgExtras).to receive(:bloat) {
           [
             { "type" => "table", "schemaname" => "public", "object_name" => "bloated_table_1", "bloat" => 8, "waste" => "0 kb" },
             { "type" => "table", "schemaname" => "public", "object_name" => "bloated_table_2", "bloat" => 8, "waste" => "77 kb" },
@@ -34,13 +34,13 @@ describe RubyPGExtras::DiagnoseData do
           ]
         }
 
-        expect(RubyPGExtras).to receive(:duplicate_indexes) {
+        expect(RubyPgExtras).to receive(:duplicate_indexes) {
           [
             { "size" => "128 kb", "idx1" => "users_pkey", "idx2" => "index_users_id" }
           ]
         }
 
-        expect(RubyPGExtras).to receive(:outliers) {
+        expect(RubyPgExtras).to receive(:outliers) {
           [
             { "query" => "SELECT * FROM users WHERE users.age > 20 AND users.height > 160", "exec_time" => "154:39:26.431466", "prop_exec_time" => "72.2%", "ncalls" => "34,211,877", "sync_io_time" => "00:34:19.784318" }
           ]
@@ -49,7 +49,7 @@ describe RubyPGExtras::DiagnoseData do
 
       it "works" do
         expect {
-          RubyPGExtras::DiagnosePrint.call(result)
+          RubyPgExtras::DiagnosePrint.call(result)
         }.not_to raise_error
       end
     end
@@ -57,7 +57,7 @@ describe RubyPGExtras::DiagnoseData do
     context "real database data" do
       it "works" do
         expect {
-          RubyPGExtras::DiagnosePrint.call(result)
+          RubyPgExtras::DiagnosePrint.call(result)
         }.not_to raise_error
       end
     end

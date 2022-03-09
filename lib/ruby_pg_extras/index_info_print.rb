@@ -2,7 +2,7 @@
 
 require 'terminal-table'
 
-module RubyPGExtras
+module RubyPgExtras
   class IndexInfoPrint
     def self.call(data)
       new.call(data)

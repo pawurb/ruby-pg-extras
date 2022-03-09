@@ -3,14 +3,14 @@
 require 'terminal-table'
 require 'uri'
 require 'pg'
-require 'ruby-pg-extras/diagnose_data'
-require 'ruby-pg-extras/diagnose_print'
-require 'ruby-pg-extras/index_info'
-require 'ruby-pg-extras/index_info_print'
-require 'ruby-pg-extras/table_info'
-require 'ruby-pg-extras/table_info_print'
+require 'ruby_pg_extras/diagnose_data'
+require 'ruby_pg_extras/diagnose_print'
+require 'ruby_pg_extras/index_info'
+require 'ruby_pg_extras/index_info_print'
+require 'ruby_pg_extras/table_info'
+require 'ruby_pg_extras/table_info_print'
 
-module RubyPGExtras
+module RubyPgExtras
   @@database_url = nil
   NEW_PG_STAT_STATEMENTS = "1.8"
 
@@ -50,7 +50,7 @@ module RubyPGExtras
 
   def self.run_query(query_name:, in_format:, args: {})
     if %i(calls outliers).include?(query_name)
-      pg_stat_statements_ver = RubyPGExtras.connection.exec("select installed_version from pg_available_extensions where name='pg_stat_statements'")
+      pg_stat_statements_ver = RubyPgExtras.connection.exec("select installed_version from pg_available_extensions where name='pg_stat_statements'")
         .to_a[0].fetch("installed_version", nil)
       if pg_stat_statements_ver != nil
         if Gem::Version.new(pg_stat_statements_ver) < Gem::Version.new(NEW_PG_STAT_STATEMENTS)
@@ -74,10 +74,10 @@ module RubyPGExtras
   end
 
   def self.diagnose(in_format: :display_table)
-    data = RubyPGExtras::DiagnoseData.call
+    data = RubyPgExtras::DiagnoseData.call
 
     if in_format == :display_table
-      RubyPGExtras::DiagnosePrint.call(data)
+      RubyPgExtras::DiagnosePrint.call(data)
     elsif in_format == :hash
       data
     elsif in_format == :array
@@ -88,10 +88,10 @@ module RubyPGExtras
   end
 
   def self.index_info(args: {}, in_format: :display_table)
-    data = RubyPGExtras::IndexInfo.call(args[:table_name])
+    data = RubyPgExtras::IndexInfo.call(args[:table_name])
 
     if in_format == :display_table
-      RubyPGExtras::IndexInfoPrint.call(data)
+      RubyPgExtras::IndexInfoPrint.call(data)
     elsif in_format == :hash
       data
     elsif in_format == :array
@@ -102,10 +102,10 @@ module RubyPGExtras
   end
 
   def self.table_info(args: {}, in_format: :display_table)
-    data = RubyPGExtras::TableInfo.call(args[:table_name])
+    data = RubyPgExtras::TableInfo.call(args[:table_name])
 
     if in_format == :display_table
-      RubyPGExtras::TableInfoPrint.call(data)
+      RubyPgExtras::TableInfoPrint.call(data)
     elsif in_format == :hash
       data
     elsif in_format == :array
@@ -155,7 +155,7 @@ module RubyPGExtras
   end
 
   def self.sql_path_for(query_name:)
-    File.join(File.dirname(__FILE__), "/ruby-pg-extras/queries/#{query_name}.sql")
+    File.join(File.dirname(__FILE__), "/ruby_pg_extras/queries/#{query_name}.sql")
   end
 
   def self.connection

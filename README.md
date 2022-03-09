@@ -23,7 +23,7 @@ Alternative versions:
 In your Gemfile
 
 ```ruby
-gem "ruby-pg-extras"
+gem "ruby-pg-extras", require: "ruby_pg_extras"
 ```
 
 `calls` and `outliers` queries require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension.
@@ -31,7 +31,7 @@ gem "ruby-pg-extras"
 You can check if it is enabled in your database by running:
 
 ```ruby
-RubyPGExtras.extensions
+RubyPgExtras.extensions
 ```
 You should see the similar line in the output:
 
@@ -42,7 +42,7 @@ You should see the similar line in the output:
 `ssl_used` requires `sslinfo` extension, and `buffercache_usage`/`buffercache_usage` queries need `pg_buffercache`. You can enable them all by running:
 
 ```ruby
-RubyPGExtras.add_extensions
+RubyPgExtras.add_extensions
 ```
 
 ## Usage
@@ -56,13 +56,13 @@ ENV["DATABASE_URL"] = "postgresql://postgres:secret@localhost:5432/database_name
 Alternatively you can set it using the module class method:
 
 ```ruby
-RubyPGExtras.database_url = "postgresql://postgres:secret@localhost:5432/database_name"
+RubyPgExtras.database_url = "postgresql://postgres:secret@localhost:5432/database_name"
 ```
 
 You can run queries using a simple Ruby API:
 
 ```ruby
-RubyPGExtras.cache_hit
+RubyPgExtras.cache_hit
 ```
 ```bash
 +----------------+------------------------+
@@ -78,15 +78,15 @@ RubyPGExtras.cache_hit
 By default the ASCII table is displayed, to change to format you need to specify the `in_format` parameter (`[:display_table, :hash, :array, :raw]` options are available):
 
 ```ruby
-RubyPGExtras.cache_hit(in_format: :hash) =>
+RubyPgExtras.cache_hit(in_format: :hash) =>
 
  [{"name"=>"index hit rate", "ratio"=>"0.97796610169491525424"}, {"name"=>"table hit rate", "ratio"=>"0.96724294813466787989"}]
 
-RubyPGExtras.cache_hit(in_format: :array) =>
+RubyPgExtras.cache_hit(in_format: :array) =>
 
  [["index hit rate", "0.97796610169491525424"], ["table hit rate", "0.96724294813466787989"]]
 
-RubyPGExtras.cache_hit(in_format: :raw) =>
+RubyPgExtras.cache_hit(in_format: :raw) =>
 
  #<PG::Result:0x00007f75777f7328 status=PGRES_TUPLES_OK ntuples=2 nfields=2 cmd_tuples=2>
 ```
@@ -94,7 +94,7 @@ RubyPGExtras.cache_hit(in_format: :raw) =>
 Some methods accept an optional `args` param allowing you to customize queries:
 
 ```ruby
-RubyPGExtras.long_running_queries(args: { threshold: "200 milliseconds" })
+RubyPgExtras.long_running_queries(args: { threshold: "200 milliseconds" })
 
 ```
 
@@ -103,7 +103,7 @@ RubyPGExtras.long_running_queries(args: { threshold: "200 milliseconds" })
 The simplest way to start using pg-extras is to execute a `diagnose` method. It runs a set of checks and prints out a report highlighting areas that may require additional investigation:
 
 ```ruby
-RubyPGExtras.diagnose
+RubyPgExtras.diagnose
 ```
 
 ![Diagnose report](https://github.com/pawurb/ruby-pg-extras/raw/master/ruby-pg-extras-diagnose.png)
@@ -117,7 +117,7 @@ Keep reading to learn about methods that `diagnose` uses under the hood.
 This method displays metadata metrics for all or a selected table. You can use it to check the table's size, its cache hit metrics, and whether it is correctly indexed. Many sequential scans or no index scans are potential indicators of misconfigured indexes. This method aggregates data provided by other methods in an easy to analyze summary format.
 
 ```ruby
-RubyPGExtras.table_info(args: { table_name: "users" })
+RubyPgExtras.table_info(args: { table_name: "users" })
 
 | Table name | Table size | Table cache hit   | Indexes cache hit  | Estimated rows | Sequential scans | Indexes scans |
 +------------+------------+-------------------+--------------------+----------------+------------------+---------------+
@@ -131,7 +131,7 @@ This method returns summary info about database indexes. You can check index siz
 
 ```ruby
 
-RubyPGExtras.index_info(args: { table_name: "users" })
+RubyPgExtras.index_info(args: { table_name: "users" })
 
 | Index name                    | Table name | Columns        | Index size | Index scans | Null frac |
 +-------------------------------+------------+----------------+------------+-------------+-----------+
@@ -148,7 +148,7 @@ RubyPGExtras.index_info(args: { table_name: "users" })
 
 ```ruby
 
-RubyPGExtras.cache_hit
+RubyPgExtras.cache_hit
 
       name      |         ratio
 ----------------+------------------------
@@ -165,7 +165,7 @@ This command provides information on the efficiency of the buffer cache, for bot
 
 ```ruby
 
-RubyPGExtras.index_cache_hit
+RubyPgExtras.index_cache_hit
 
 | name                  | buffer_hits | block_reads | total_read | ratio             |
 +-----------------------+-------------+-------------+------------+-------------------+
@@ -183,7 +183,7 @@ The same as `cache_hit` with each table's indexes cache hit info displayed separ
 
 ```ruby
 
-RubyPGExtras.table_cache_hit
+RubyPgExtras.table_cache_hit
 
 | name                  | buffer_hits | block_reads | total_read | ratio             |
 +-----------------------+-------------+-------------+------------+-------------------+
@@ -201,7 +201,7 @@ The same as `cache_hit` with each table's cache hit info displayed seperately.
 
 ```ruby
 
-RubyPGExtras.db_settings
+RubyPgExtras.db_settings
 
              name             | setting | unit |
 ------------------------------+---------+------+
@@ -221,7 +221,7 @@ This method displays values for selected PostgreSQL settings. You can compare th
 
 ```ruby
 
-RubyPGExtras.ssl_used
+RubyPgExtras.ssl_used
 
 | ssl_is_used                     |
 +---------------------------------+
@@ -235,7 +235,7 @@ Returns boolean indicating if an encrypted SSL is currently used. Connecting to 
 
 ```ruby
 
-RubyPGExtras.index_usage
+RubyPgExtras.index_usage
 
        relname       | percent_of_times_index_used | rows_in_table
 ---------------------+-----------------------------+---------------
@@ -253,7 +253,7 @@ This command provides information on the efficiency of indexes, represented as w
 
 ```ruby
 
-RubyPGExtras.locks
+RubyPgExtras.locks
 
  procpid | relname | transactionid | granted |     query_snippet     | mode             |       age
 ---------+---------+---------------+---------+-----------------------+-------------------------------------
@@ -274,7 +274,7 @@ This command displays queries that have taken out an exclusive lock on a relatio
 
 ```ruby
 
-RubyPGExtras.all_locks
+RubyPgExtras.all_locks
 
 ```
 
@@ -284,7 +284,7 @@ This command displays all the current locks, regardless of their type.
 
 ```ruby
 
-RubyPGExtras.outliers(args: { limit: 20 })
+RubyPgExtras.outliers(args: { limit: 20 })
 
                    query                 |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
 -----------------------------------------+------------------+----------------+-------------+--------------
@@ -308,7 +308,7 @@ Typically, an efficient query will have an appropriate ratio of calls to total e
 
 ```ruby
 
-RubyPGExtras.calls(args: { limit: 10 })
+RubyPgExtras.calls(args: { limit: 10 })
 
                    qry                   |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
 -----------------------------------------+------------------+----------------+-------------+--------------
@@ -330,7 +330,7 @@ This command is much like `pg:outliers`, but ordered by the number of times a st
 
 ```ruby
 
-RubyPGExtras.blocking
+RubyPgExtras.blocking
 
  blocked_pid |    blocking_statement    | blocking_duration | blocking_pid |                                        blocked_statement                           | blocked_duration
 -------------+--------------------------+-------------------+--------------+------------------------------------------------------------------------------------+------------------
@@ -346,7 +346,7 @@ This command displays statements that are currently holding locks that other sta
 
 ```ruby
 
-RubyPGExtras.total_index_size
+RubyPgExtras.total_index_size
 
   size
 -------
@@ -360,7 +360,7 @@ This command displays the total size of all indexes on the database, in MB. It i
 
 ```ruby
 
-RubyPGExtras.index_size
+RubyPgExtras.index_size
 
                              name                              |  size
 ---------------------------------------------------------------+---------
@@ -383,7 +383,7 @@ This command displays the size of each each index in the database, in MB. It is 
 
 ```ruby
 
-RubyPGExtras.table_size
+RubyPgExtras.table_size
 
                              name                              |  size
 ---------------------------------------------------------------+---------
@@ -401,7 +401,7 @@ This command displays the size of each table and materialized view in the databa
 
 ```ruby
 
-RubyPGExtras.table_indexes_size
+RubyPgExtras.table_indexes_size
 
                              table                             | indexes_size
 ---------------------------------------------------------------+--------------
@@ -419,7 +419,7 @@ This command displays the total size of indexes for each table and materialized 
 
 ```ruby
 
-RubyPGExtras.total_table_size
+RubyPgExtras.total_table_size
 
                              name                              |  size
 ---------------------------------------------------------------+---------
@@ -437,7 +437,7 @@ This command displays the total size of each table and materialized view in the 
 
 ```ruby
 
-RubyPGExtras.unused_indexes(args: { max_scans: 20 })
+RubyPgExtras.unused_indexes(args: { max_scans: 20 })
 
           table      |                       index                | index_size | index_scans
 ---------------------+--------------------------------------------+------------+-------------
@@ -455,7 +455,7 @@ This command displays indexes that have < 50 scans recorded against them, and ar
 
 ```ruby
 
-RubyPGExtras.duplicate_indexes
+RubyPgExtras.duplicate_indexes
 
 | size       |  idx1        |  idx2          |  idx3    |  idx4     |
 +------------+--------------+----------------+----------+-----------+
@@ -468,7 +468,7 @@ This command displays multiple indexes that have the same set of columns, same o
 
 ```ruby
 
-RubyPGExtras.null_indexes(args: { min_relation_size_mb: 10 })
+RubyPgExtras.null_indexes(args: { min_relation_size_mb: 10 })
 
    oid   |         index      | index_size | unique | indexed_column | null_frac | expected_saving
 ---------+--------------------+------------+--------+----------------+-----------+-----------------
@@ -486,7 +486,7 @@ This command displays indexes that contain `NULL` values. A high ratio of `NULL`
 
 ```ruby
 
-RubyPGExtras.seq_scans
+RubyPgExtras.seq_scans
 
 
                name                |  count
@@ -510,7 +510,7 @@ This command displays the number of sequential scans recorded against all tables
 
 ```ruby
 
-RubyPGExtras.long_running_queries(args: { threshold: "200 milliseconds" })
+RubyPgExtras.long_running_queries(args: { threshold: "200 milliseconds" })
 
 
   pid  |    duration     |                                      query
@@ -527,7 +527,7 @@ This command displays currently running queries, that have been running for long
 
 ```ruby
 
-RubyPGExtras.records_rank
+RubyPgExtras.records_rank
 
                name                | estimated_count
 -----------------------------------+-----------------
@@ -546,7 +546,7 @@ This command displays an estimated count of rows per table, descending by estima
 
 ```ruby
 
-RubyPGExtras.bloat
+RubyPgExtras.bloat
 
 
  type  | schemaname |           object_name         | bloat |   waste
@@ -567,7 +567,7 @@ This command displays an estimation of table "bloat" – space allocated to a re
 
 ```ruby
 
-RubyPGExtras.vacuum_stats
+RubyPgExtras.vacuum_stats
 
  schema |         table         | last_vacuum | last_autovacuum  |    rowcount    | dead_rowcount  | autovacuum_threshold | expect_autovacuum
 --------+-----------------------+-------------+------------------+----------------+----------------+----------------------+-------------------
@@ -585,7 +585,7 @@ This command displays statistics related to vacuum operations for each table, in
 
 ```ruby
 
-RubyPGExtras.kill_all
+RubyPgExtras.kill_all
 
 ```
 
@@ -594,7 +594,7 @@ This commands kills all the currently active connections to the database. It can
 ### `pg_stat_statements_reset`
 
 ```ruby
-RubyPGExtras.pg_stat_statements_reset
+RubyPgExtras.pg_stat_statements_reset
 ```
 
 This command discards all statistics gathered so far by pg_stat_statements.
@@ -602,7 +602,7 @@ This command discards all statistics gathered so far by pg_stat_statements.
 ### `buffercache_stats`
 
 ```ruby
-RubyPGExtras.buffercache_stats(args: { limit: 10 })
+RubyPgExtras.buffercache_stats(args: { limit: 10 })
 ```
 
 This command shows the relations buffered in database share buffer, ordered by percentage taken. It also shows that how much of the whole relation is buffered.
@@ -610,7 +610,7 @@ This command shows the relations buffered in database share buffer, ordered by p
 ### `buffercache_usage`
 
 ```ruby
-RubyPGExtras.buffercache_usage(args: { limit: 20 })
+RubyPgExtras.buffercache_usage(args: { limit: 20 })
 ```
 
 This command calculates how many blocks from which table are currently cached.
@@ -619,7 +619,7 @@ This command calculates how many blocks from which table are currently cached.
 
 ```ruby
 
-RubyPGExtras.extensions
+RubyPgExtras.extensions
 
 ```
 
@@ -629,7 +629,7 @@ This command lists all the currently installed and available PostgreSQL extensio
 
 ```ruby
 
-RubyPGExtras.mandelbrot
+RubyPgExtras.mandelbrot
 
 ```
 

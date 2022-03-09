@@ -2,7 +2,7 @@
 
 require 'terminal-table'
 
-module RubyPGExtras
+module RubyPgExtras
   class DiagnosePrint
     def self.call(data)
       new.call(data)

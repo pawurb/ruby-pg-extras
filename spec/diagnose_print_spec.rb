@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-describe RubyPGExtras::DiagnosePrint do
+describe RubyPgExtras::DiagnosePrint do
   subject(:print_result) do
-    RubyPGExtras::DiagnosePrint.call(data)
+    RubyPgExtras::DiagnosePrint.call(data)
   end
 
   let(:data) do

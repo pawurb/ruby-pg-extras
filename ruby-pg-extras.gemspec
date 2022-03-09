@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'ruby-pg-extras/version'
+require 'ruby_pg_extras/version'
 
 Gem::Specification.new do |s|
   s.name          = "ruby-pg-extras"
-  s.version       = RubyPGExtras::VERSION
+  s.version       = RubyPgExtras::VERSION
   s.authors       = ["pawurb"]
   s.email         = ["contact@pawelurbanek.com"]
   s.summary       = %q{ Ruby PostgreSQL performance database insights }

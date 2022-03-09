@@ -1,4 +1,4 @@
-module RubyPGExtras
+module RubyPgExtras
   class IndexInfo
     def self.call(table_name = nil)
       new.call(table_name)
@@ -55,7 +55,7 @@ module RubyPGExtras
     private
 
     def query_module
-      RubyPGExtras
+      RubyPgExtras
     end
   end
 end

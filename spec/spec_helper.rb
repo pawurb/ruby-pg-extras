@@ -2,7 +2,7 @@
 
 require 'rubygems'
 require 'bundler/setup'
-require_relative '../lib/ruby-pg-extras'
+require_relative '../lib/ruby_pg_extras'
 
 pg_version = ENV["PG_VERSION"]
 
@@ -20,8 +20,8 @@ ENV["DATABASE_URL"] ||= "postgresql://postgres:secret@localhost:#{port}/ruby-pg-
 
 RSpec.configure do |config|
   config.before(:suite) do
-    RubyPGExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS pg_stat_statements;")
-    RubyPGExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS pg_buffercache;")
-    RubyPGExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS sslinfo;")
+    RubyPgExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS pg_stat_statements;")
+    RubyPgExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS pg_buffercache;")
+    RubyPgExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS sslinfo;")
   end
 end

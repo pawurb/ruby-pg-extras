@@ -2,7 +2,7 @@
 
 require 'filesize'
 
-module RubyPGExtras
+module RubyPgExtras
   class DiagnoseData
     PG_EXTRAS_TABLE_CACHE_HIT_MIN_EXPECTED = "0.985"
     PG_EXTRAS_INDEX_CACHE_HIT_MIN_EXPECTED = "0.985"
@@ -52,7 +52,7 @@ module RubyPGExtras
     private
 
     def query_module
-      RubyPGExtras
+      RubyPgExtras
     end
 
     def table_cache_hit
