@@ -2,7 +2,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/ruby:2.6.5
+      - image: cimg/ruby:2.6.5
         environment:
           DATABASE_URL: postgresql://postgres:secret@localhost:5432/ruby-pg-extras-test
       - image: circleci/postgres:11.5
