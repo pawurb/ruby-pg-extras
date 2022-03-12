@@ -23,7 +23,7 @@ Alternative versions:
 In your Gemfile
 
 ```ruby
-gem "ruby-pg-extras", require: "ruby_pg_extras"
+gem "ruby-pg-extras"
 ```
 
 `calls` and `outliers` queries require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension.

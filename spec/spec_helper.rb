@@ -2,7 +2,7 @@
 
 require 'rubygems'
 require 'bundler/setup'
-require_relative '../lib/ruby_pg_extras'
+require_relative '../lib/ruby-pg-extras'
 
 pg_version = ENV["PG_VERSION"]
 
