@@ -1,4 +1,4 @@
-/* Index hit rate (effective databases are at 99% and up) */
+/* Index hit rate (effective databases are at 99 percent and up) */
 
 SELECT relname,
    CASE idx_scan
@@ -8,5 +8,7 @@ SELECT relname,
    n_live_tup rows_in_table
  FROM
    pg_stat_user_tables
+ WHERE
+   schemaname = '%{schema}'
  ORDER BY
    n_live_tup DESC;

@@ -8,5 +8,6 @@ SELECT
   idx_scan as index_scans
 FROM pg_stat_user_indexes ui
 JOIN pg_index i ON ui.indexrelid = i.indexrelid
+WHERE schemaname = '%{schema}'
 ORDER BY pg_relation_size(i.indexrelid) / nullif(idx_scan, 0) DESC NULLS FIRST,
 pg_relation_size(i.indexrelid) DESC;
