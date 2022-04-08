@@ -34,8 +34,17 @@ module RubyPgExtras
     outliers_legacy: { limit: 10 },
     buffercache_stats: { limit: 10 },
     buffercache_usage: { limit: 20 },
-    unused_indexes: { max_scans: 50 },
-    null_indexes: { min_relation_size_mb: 10 }
+    unused_indexes: { max_scans: 50, schema: "public" },
+    null_indexes: { min_relation_size_mb: 10 },
+    index_usage: { schema: "public" },
+    index_cache_hit: { schema: "public" },
+    table_cache_hit: { schema: "public" },
+    index_scans: { schema: "public" },
+    cache_hit: { schema: "public" },
+    seq_scans: { schema: "public" },
+    table_index_scans: { schema: "public" },
+    records_rank: { schema: "public" },
+    tables: { schema: "public" }
   })
 
   QUERIES.each do |query_name|

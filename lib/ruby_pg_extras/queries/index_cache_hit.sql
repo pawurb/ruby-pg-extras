@@ -11,5 +11,7 @@ SELECT
   END ratio
 FROM
   pg_statio_user_tables
+WHERE
+  schemaname = '%{schema}'
 ORDER BY
   idx_blks_hit / (idx_blks_hit + idx_blks_read + 1)::float DESC;

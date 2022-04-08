@@ -5,5 +5,7 @@ SELECT
   n_live_tup AS estimated_count
 FROM
   pg_stat_user_tables
+WHERE
+  schemaname = '%{schema}'
 ORDER BY
   n_live_tup DESC;
