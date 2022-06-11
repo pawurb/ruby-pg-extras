@@ -16,7 +16,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.license       = "MIT"
   s.add_dependency "pg"
-  s.add_dependency "filesize"
   s.add_dependency "terminal-table"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
