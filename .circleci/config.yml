@@ -28,7 +28,7 @@ jobs:
           POSTGRES_PASSWORD: secret
       - image: cimg/postgres:14.2
         command: postgres -c shared_preload_libraries=pg_stat_statements
-        name: postgres13
+        name: postgres14
         environment:
           POSTGRES_USER: postgres
           POSTGRES_DB: ruby-pg-extras-test
