@@ -7,7 +7,8 @@ SELECT
   pg_locks.granted,
   pg_locks.mode,
   pg_stat_activity.query AS query_snippet,
-  age(now(),pg_stat_activity.query_start) AS "age"
+  age(now(),pg_stat_activity.query_start) AS "age",
+  pg_stat_activity.application_name AS application
 FROM pg_stat_activity,pg_locks left
 OUTER JOIN pg_class
   ON (pg_locks.relation = pg_class.oid)
