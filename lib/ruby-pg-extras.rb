@@ -3,6 +3,7 @@
 require 'terminal-table'
 require 'uri'
 require 'pg'
+require 'ruby_pg_extras/size_parser'
 require 'ruby_pg_extras/diagnose_data'
 require 'ruby_pg_extras/diagnose_print'
 require 'ruby_pg_extras/index_info'

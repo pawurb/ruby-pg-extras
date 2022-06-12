@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
-require 'filesize'
-
 module RubyPgExtras
   class DiagnoseData
     PG_EXTRAS_TABLE_CACHE_HIT_MIN_EXPECTED = "0.985"
     PG_EXTRAS_INDEX_CACHE_HIT_MIN_EXPECTED = "0.985"
     PG_EXTRAS_UNUSED_INDEXES_MAX_SCANS = 20
-    PG_EXTRAS_UNUSED_INDEXES_MIN_SIZE_BYTES = Filesize.from("1 MB").to_i # 1000000 bytes
+    PG_EXTRAS_UNUSED_INDEXES_MIN_SIZE_BYTES = SizeParser.to_i("1 MB") # 1000000 bytes
     PG_EXTRAS_NULL_INDEXES_MIN_SIZE_MB = 1 # 1 MB
     PG_EXTRAS_NULL_MIN_NULL_FRAC_PERCENT = 50 # 50%
     PG_EXTRAS_BLOAT_MIN_VALUE = 10
@@ -118,7 +116,7 @@ module RubyPgExtras
         in_format: :hash,
         args: { min_scans: PG_EXTRAS_UNUSED_INDEXES_MAX_SCANS }
       ).select do |i|
-        Filesize.from(i.fetch("index_size").sub("bytes", "").strip).to_i >= PG_EXTRAS_UNUSED_INDEXES_MIN_SIZE_BYTES
+        SizeParser.to_i(i.fetch("index_size").strip) >= PG_EXTRAS_UNUSED_INDEXES_MIN_SIZE_BYTES
       end
 
       if indexes.count == 0
