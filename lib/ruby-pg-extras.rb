@@ -24,7 +24,7 @@ module RubyPgExtras
     table_size total_index_size total_table_size
     unused_indexes duplicate_indexes vacuum_stats kill_all
     pg_stat_statements_reset buffercache_stats
-    buffercache_usage ssl_used
+    buffercache_usage ssl_used connections
   )
 
   DEFAULT_ARGS = Hash.new({}).merge({
