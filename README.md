@@ -635,6 +635,24 @@ RubyPgExtras.mandelbrot
 
 This command outputs the Mandelbrot set, calculated through SQL.
 
+### `connections`
+
+```ruby
+
+RubyPgExtras.connections
+
++-----------------------------------------------------+
+| Returns the list of all active database connections |
++-----------------+----------------+------------------+
+| username        | client_address | application_name |
++-----------------+----------------+------------------+
+| postgres        | 172.19.0.1/32  | psql             |
+| postgres        | 172.19.0.1/32  | irb              |
++-----------------+----------------+------------------+
+```
+
+This command returns the list of all active database connections.
+
 ## Testing
 
 ```bash
