@@ -625,16 +625,6 @@ RubyPgExtras.extensions
 
 This command lists all the currently installed and available PostgreSQL extensions.
 
-### `mandelbrot`
-
-```ruby
-
-RubyPgExtras.mandelbrot
-
-```
-
-This command outputs the Mandelbrot set, calculated through SQL.
-
 ### `connections`
 
 ```ruby
@@ -652,6 +642,16 @@ RubyPgExtras.connections
 ```
 
 This command returns the list of all active database connections.
+
+### `mandelbrot`
+
+```ruby
+
+RubyPgExtras.mandelbrot
+
+```
+
+This command outputs the Mandelbrot set, calculated through SQL.
 
 ## Testing
 
