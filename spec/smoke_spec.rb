@@ -13,7 +13,7 @@ describe RubyPgExtras do
     end
   end
 
-  RubyPgExtras::QUERIES.each do |query_name|
+  RubyPgExtras::QUERIES.reject { |q| q == :kill_all }.each do |query_name|
     it "#{query_name} query can be executed" do
       expect do
         RubyPgExtras.run_query(
