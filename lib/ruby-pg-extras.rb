@@ -22,7 +22,7 @@ module RubyPgExtras
     long_running_queries mandelbrot outliers
     records_rank seq_scans table_index_scans table_indexes_size
     table_size total_index_size total_table_size
-    unused_indexes duplicate_indexes vacuum_stats kill_all kill_by_pid
+    unused_indexes duplicate_indexes vacuum_stats kill_all kill_pid
     pg_stat_statements_reset buffercache_stats
     buffercache_usage ssl_used connections
   )
@@ -46,7 +46,7 @@ module RubyPgExtras
     table_index_scans: { schema: "public" },
     records_rank: { schema: "public" },
     tables: { schema: "public" },
-    kill_by_pid: { pid: 0 }
+    kill_pid: { pid: 0 }
   })
 
   QUERIES.each do |query_name|

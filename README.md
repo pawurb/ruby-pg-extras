@@ -591,11 +591,11 @@ RubyPgExtras.kill_all
 
 This commands kills all the currently active connections to the database. It can be useful as a last resort when your database is stuck in a deadlock.
 
-### `kill_by_pid`
+### `kill_pid`
 
 ```ruby
 
-RubyPgExtras.kill_by_pid(args: { pid: 4657 })
+RubyPgExtras.kill_pid(args: { pid: 4657 })
 
 ```
 
