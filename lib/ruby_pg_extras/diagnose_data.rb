@@ -25,13 +25,15 @@ module RubyPgExtras
         :duplicate_indexes
       ].yield_self do |checks|
         extensions_data = query_module.extensions(in_format: :hash)
+
         pg_stats_enabled = extensions_data.find do |el|
           el.fetch("name") == "pg_stat_statements"
         end.fetch("installed_version", false)
 
-        ssl_info_enabled = extensions_data.find do |el|
+        ssl_info = extensions_data.find do |el|
           el.fetch("name") == "sslinfo"
-        end.fetch("installed_version", false)
+        end
+        ssl_info_enabled = ssl_info != nil && ssl_info.fetch("installed_version", false)
 
         if pg_stats_enabled
           checks = checks.concat([:outliers])
