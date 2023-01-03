@@ -15,4 +15,6 @@ OUTER JOIN pg_class
 WHERE pg_stat_activity.query <> '<insufficient privilege>'
   AND pg_locks.pid = pg_stat_activity.pid
   AND pg_locks.mode IN ('ExclusiveLock', 'AccessExclusiveLock', 'RowExclusiveLock')
-  AND pg_stat_activity.pid <> pg_backend_pid() order by query_start;
+  AND pg_stat_activity.pid <> pg_backend_pid()
+ORDER BY query_start
+LIMIT %{limit};

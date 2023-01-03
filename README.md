@@ -253,7 +253,7 @@ This command provides information on the efficiency of indexes, represented as w
 
 ```ruby
 
-RubyPgExtras.locks
+RubyPgExtras.locks(args: { limit: 20 })
 
  procpid | relname | transactionid | granted |     query_snippet     | mode             |       age        |   application |
 ---------+---------+---------------+---------+-----------------------+------------------------------------------------------
