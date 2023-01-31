@@ -179,6 +179,6 @@ module RubyPgExtras
   end
 
   def self.database_url
-    @@database_url || ENV.fetch("DATABASE_URL")
+    @@database_url || ENV["RUBY_PG_EXTRAS_DATABASE_URL"] || ENV.fetch("DATABASE_URL")
   end
 end

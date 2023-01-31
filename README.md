@@ -47,7 +47,7 @@ RubyPgExtras.add_extensions
 
 ## Usage
 
-Gem expects the `ENV['DATABASE_URL']` value in the following format:
+Gem expects the `ENV['RUBY_PG_EXTRAS_DATABASE_URL']` or `ENV['DATABASE_URL']` value in the following format:
 
 ```ruby
 ENV["DATABASE_URL"] = "postgresql://postgres:secret@localhost:5432/database_name"
