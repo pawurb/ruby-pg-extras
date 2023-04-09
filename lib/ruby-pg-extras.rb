@@ -32,6 +32,7 @@ module RubyPgExtras
     calls_legacy: { limit: 10 },
     long_running_queries: { threshold: "500 milliseconds" },
     locks: { limit: 20 },
+    blocking: { limit: 20 },
     outliers: { limit: 10 },
     outliers_legacy: { limit: 10 },
     buffercache_stats: { limit: 10 },
