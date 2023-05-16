@@ -106,7 +106,7 @@ The simplest way to start using pg-extras is to execute a `diagnose` method. It 
 RubyPgExtras.diagnose
 ```
 
-![Diagnose report](https://github.com/pawurb/ruby-pg-extras/raw/master/ruby-pg-extras-diagnose.png)
+![Diagnose report](https://github.com/pawurb/ruby-pg-extras/raw/main/ruby-pg-extras-diagnose.png)
 
 Keep reading to learn about methods that `diagnose` uses under the hood.
 
