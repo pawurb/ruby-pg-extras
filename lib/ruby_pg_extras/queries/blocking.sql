@@ -6,7 +6,8 @@ SELECT bl.pid AS blocked_pid,
   kl.pid AS blocking_pid,
   a.query AS blocked_statement,
   now() - a.query_start AS blocked_duration,
-  a.application_name AS application
+  a.application_name AS blocked_sql_app,
+  ka.application_name AS blocking_sql_app
 FROM pg_catalog.pg_locks bl
 JOIN pg_catalog.pg_stat_activity a
   ON bl.pid = a.pid
