@@ -16,5 +16,5 @@ JOIN pg_catalog.pg_locks kl
     ON kl.pid = ka.pid
 ON bl.transactionid = kl.transactionid AND bl.pid != kl.pid
 WHERE NOT bl.granted
-ORDER BY blocked_duration
+ORDER BY blocked_duration DESC
 LIMIT %{limit};
