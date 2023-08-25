@@ -10,13 +10,15 @@ SELECT
         WHEN 0 THEN ''
         ELSE to_char(s.null_frac * 100, '999.00%%')
     END AS null_frac,
-    pg_size_pretty((pg_relation_size(c.oid) * s.null_frac)::bigint) AS expected_saving
+    pg_size_pretty((pg_relation_size(c.oid) * s.null_frac)::bigint) AS expected_saving,
+    n.nspname as schema
 FROM
     pg_class c
     JOIN pg_index i ON i.indexrelid = c.oid
     JOIN pg_attribute a ON a.attrelid = c.oid
     JOIN pg_class c_table ON c_table.oid = i.indrelid
     JOIN pg_indexes ixs ON c.relname = ixs.indexname
+    LEFT JOIN pg_namespace n ON (n.oid = c.relnamespace)
     LEFT JOIN pg_stats s ON s.tablename = c_table.relname AND a.attname = s.attname
 WHERE
     -- Primary key cannot be partial

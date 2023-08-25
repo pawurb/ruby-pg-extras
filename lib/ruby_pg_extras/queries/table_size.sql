@@ -1,7 +1,8 @@
 /* Size of the tables (excluding indexes), descending by size */
 
 SELECT c.relname AS name,
-  pg_size_pretty(pg_table_size(c.oid)) AS size
+  pg_size_pretty(pg_table_size(c.oid)) AS size,
+  n.nspname as schema
 FROM pg_class c
 LEFT JOIN pg_namespace n ON (n.oid = c.relnamespace)
 WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
