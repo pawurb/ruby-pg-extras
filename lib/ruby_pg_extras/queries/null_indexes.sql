@@ -6,6 +6,7 @@ SELECT
     pg_size_pretty(pg_relation_size(c.oid)) AS index_size,
     i.indisunique AS unique,
     a.attname AS indexed_column,
+    s.tablename AS table,
     CASE s.null_frac
         WHEN 0 THEN ''
         ELSE to_char(s.null_frac * 100, '999.00%%')
