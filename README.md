@@ -98,6 +98,8 @@ RubyPgExtras.long_running_queries(args: { threshold: "200 milliseconds" })
 
 ```
 
+You can customize the default `public` schema by setting `ENV['PG_EXTRAS_SCHEMA']` value.
+
 ## Diagnose report
 
 The simplest way to start using pg-extras is to execute a `diagnose` method. It runs a set of checks and prints out a report highlighting areas that may require additional investigation:
