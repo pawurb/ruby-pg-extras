@@ -10,6 +10,8 @@ Alternative versions:
 
 - [Ruby on Rails](https://github.com/pawurb/rails-pg-extras)
 
+- [Rust](https://github.com/pawurb/rust-pg-extras)
+
 - [NodeJS](https://github.com/pawurb/node-postgres-extras)
 
 - [Elixir](https://github.com/pawurb/ecto_psql_extras)
