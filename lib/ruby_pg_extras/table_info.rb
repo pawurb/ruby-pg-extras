@@ -35,7 +35,7 @@ module RubyPgExtras
           end.fetch("count", "N/A"),
           indexes_scans: table_index_scans_data.find do |el|
             el.fetch("name") == table_name
-          end.fetch("count", "N/A")
+          end.fetch("count", "N/A"),
         }
       end
     end

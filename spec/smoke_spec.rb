@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe RubyPgExtras do
   RubyPgExtras::QUERIES.each do |query_name|
     it "#{query_name} description can be read" do
       expect do
         RubyPgExtras.description_for(
-          query_name: query_name
+          query_name: query_name,
         )
       end.not_to raise_error
     end
@@ -18,7 +18,7 @@ describe RubyPgExtras do
       expect do
         RubyPgExtras.run_query(
           query_name: query_name,
-          in_format: :hash
+          in_format: :hash,
         )
       end.not_to raise_error
     end

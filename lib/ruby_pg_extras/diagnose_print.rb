@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'terminal-table'
+require "terminal-table"
 
 module RubyPgExtras
   class DiagnosePrint
@@ -17,13 +17,13 @@ module RubyPgExtras
 
         [
           colorize("[#{symbol}] - #{el.fetch(:check_name)}", color),
-          colorize(el.fetch(:message), color)
+          colorize(el.fetch(:message), color),
         ]
       end
 
       puts Terminal::Table.new(
         title: title,
-        rows: rows
+        rows: rows,
       )
     end
 

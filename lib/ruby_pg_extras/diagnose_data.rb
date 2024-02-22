@@ -22,7 +22,7 @@ module RubyPgExtras
         :unused_indexes,
         :null_indexes,
         :bloat,
-        :duplicate_indexes
+        :duplicate_indexes,
       ].yield_self do |checks|
         extensions_data = query_module.extensions(in_format: :hash)
 
@@ -66,12 +66,12 @@ module RubyPgExtras
       if table_cache_hit_ratio > min_expected
         {
           ok: true,
-          message: "Table cache hit ratio is correct: #{table_cache_hit_ratio}."
+          message: "Table cache hit ratio is correct: #{table_cache_hit_ratio}.",
         }
       else
         {
           ok: false,
-          message: "Table hit ratio is too low: #{table_cache_hit_ratio}."
+          message: "Table hit ratio is too low: #{table_cache_hit_ratio}.",
         }
       end
     end
@@ -87,12 +87,12 @@ module RubyPgExtras
       if index_cache_hit_ratio > min_expected
         {
           ok: true,
-          message: "Index hit ratio is correct: #{index_cache_hit_ratio}."
+          message: "Index hit ratio is correct: #{index_cache_hit_ratio}.",
         }
       else
         {
           ok: false,
-          message: "Index hit ratio is too low: #{index_cache_hit_ratio}."
+          message: "Index hit ratio is too low: #{index_cache_hit_ratio}.",
         }
       end
     end
@@ -103,12 +103,12 @@ module RubyPgExtras
       if ssl_connection
         {
           ok: true,
-          message: "Database client is using a secure SSL connection."
+          message: "Database client is using a secure SSL connection.",
         }
       else
         {
           ok: false,
-          message: "Database client is using an unencrypted connection."
+          message: "Database client is using an unencrypted connection.",
         }
       end
     end
@@ -116,7 +116,7 @@ module RubyPgExtras
     def unused_indexes
       indexes = query_module.unused_indexes(
         in_format: :hash,
-        args: { min_scans: PG_EXTRAS_UNUSED_INDEXES_MAX_SCANS }
+        args: { min_scans: PG_EXTRAS_UNUSED_INDEXES_MAX_SCANS },
       ).select do |i|
         SizeParser.to_i(i.fetch("index_size").strip) >= PG_EXTRAS_UNUSED_INDEXES_MIN_SIZE_BYTES
       end
@@ -124,15 +124,15 @@ module RubyPgExtras
       if indexes.count == 0
         {
           ok: true,
-          message: "No unused indexes detected."
+          message: "No unused indexes detected.",
         }
       else
         print_indexes = indexes.map do |i|
-          "'#{i.fetch('index')}' on '#{i.fetch('table')}' size #{i.fetch('index_size')}"
+          "'#{i.fetch("index")}' on '#{i.fetch("table")}' size #{i.fetch("index_size")}"
         end.join(",\n")
         {
           ok: false,
-          message: "Unused indexes detected:\n#{print_indexes}"
+          message: "Unused indexes detected:\n#{print_indexes}",
         }
       end
     end
@@ -140,7 +140,7 @@ module RubyPgExtras
     def null_indexes
       indexes = query_module.null_indexes(
         in_format: :hash,
-        args: { min_relation_size_mb: PG_EXTRAS_NULL_INDEXES_MIN_SIZE_MB }
+        args: { min_relation_size_mb: PG_EXTRAS_NULL_INDEXES_MIN_SIZE_MB },
       ).select do |i|
         i.fetch("null_frac").gsub("%", "").to_f >= PG_EXTRAS_NULL_MIN_NULL_FRAC_PERCENT
       end
@@ -148,15 +148,15 @@ module RubyPgExtras
       if indexes.count == 0
         {
           ok: true,
-          message: "No null indexes detected."
+          message: "No null indexes detected.",
         }
       else
         print_indexes = indexes.map do |i|
-          "'#{i.fetch('index')}' size #{i.fetch('index_size')} null values fraction #{i.fetch('null_frac')}"
+          "'#{i.fetch("index")}' size #{i.fetch("index_size")} null values fraction #{i.fetch("null_frac")}"
         end.join(",\n")
         {
           ok: false,
-          message: "Null indexes detected:\n#{print_indexes}"
+          message: "Null indexes detected:\n#{print_indexes}",
         }
       end
     end
@@ -169,16 +169,16 @@ module RubyPgExtras
       if bloat_data.count == 0
         {
           ok: true,
-          message: "No bloat detected."
+          message: "No bloat detected.",
         }
       else
         print_bloat = bloat_data.map do |b|
-          "'#{b.fetch('object_name')}' bloat #{b.fetch('bloat')} waste #{b.fetch('waste')}"
+          "'#{b.fetch("object_name")}' bloat #{b.fetch("bloat")} waste #{b.fetch("waste")}"
         end.join(",\n")
 
         {
           ok: false,
-          message: "Bloat detected:\n#{print_bloat}"
+          message: "Bloat detected:\n#{print_bloat}",
         }
       end
     end
@@ -189,16 +189,16 @@ module RubyPgExtras
       if indexes.count == 0
         {
           ok: true,
-          message: "No duplicate indexes detected."
+          message: "No duplicate indexes detected.",
         }
       else
         print_indexes = indexes.map do |i|
-          "'#{i.fetch('idx1')}' of size #{i.fetch('size')} is identical to '#{i.fetch('idx2')}'"
+          "'#{i.fetch("idx1")}' of size #{i.fetch("size")} is identical to '#{i.fetch("idx2")}'"
         end.join(",\n")
 
         {
           ok: false,
-          message: "Duplicate indexes detected:\n#{print_indexes}"
+          message: "Duplicate indexes detected:\n#{print_indexes}",
         }
       end
     end
@@ -211,16 +211,16 @@ module RubyPgExtras
       if queries.count == 0
         {
           ok: true,
-          message: "No queries using significant execution ratio detected."
+          message: "No queries using significant execution ratio detected.",
         }
       else
         print_queries = queries.map do |q|
-          "'#{q.fetch('query').slice(0, 30)}...' called #{q.fetch('ncalls')} times, using #{q.fetch('prop_exec_time')} of total exec time."
+          "'#{q.fetch("query").slice(0, 30)}...' called #{q.fetch("ncalls")} times, using #{q.fetch("prop_exec_time")} of total exec time."
         end.join(",\n")
 
         {
           ok: false,
-          message: "Queries using significant execution ratio detected:\n#{print_queries}"
+          message: "Queries using significant execution ratio detected:\n#{print_queries}",
         }
       end
     end

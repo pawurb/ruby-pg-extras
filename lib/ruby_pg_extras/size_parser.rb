@@ -10,7 +10,7 @@ module RubyPgExtras
     end
 
     def self.regexp_for_units(units)
-      /\A(-?\d+)\s?(#{units.join('|')})\z/i
+      /\A(-?\d+)\s?(#{units.join("|")})\z/i
     end
 
     SI_UNITS = %w[bytes kB MB GB TB PB EB ZB YB].map(&:downcase).freeze
@@ -32,7 +32,7 @@ module RubyPgExtras
       return nil unless match_data
 
       exponent = units.index(match_data[2].downcase).to_i
-      match_data[1].to_i * multiplier**exponent
+      match_data[1].to_i * multiplier ** exponent
     end
 
     DIGITS_ONLY_REGEXP = /\A(-?\d+)\z/.freeze

@@ -19,16 +19,16 @@ module RubyPgExtras
         {
           index_name: index_name,
           table_name: index_data.fetch("tablename"),
-          columns: index_data.fetch("columns").split(',').map(&:strip),
+          columns: index_data.fetch("columns").split(",").map(&:strip),
           index_size: index_size_data.find do |el|
             el.fetch("name") == index_name
           end.fetch("size", "N/A"),
-          index_scans:  index_scans_data.find do |el|
+          index_scans: index_scans_data.find do |el|
             el.fetch("index") == index_name
           end.fetch("index_scans", "N/A"),
           null_frac: null_indexes_data.find do |el|
             el.fetch("index") == index_name
-          end&.fetch("null_frac", "N/A")&.strip || "0.00%"
+          end&.fetch("null_frac", "N/A")&.strip || "0.00%",
         }
       end
     end
@@ -40,7 +40,7 @@ module RubyPgExtras
     def null_indexes_data
       @_null_indexes_data ||= query_module.null_indexes(
         in_format: :hash,
-        args: { min_relation_size_mb: 0 }
+        args: { min_relation_size_mb: 0 },
       )
     end
 

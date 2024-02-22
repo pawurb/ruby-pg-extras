@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe RubyPgExtras::TableInfo do
   subject(:result) do
@@ -13,14 +13,14 @@ describe RubyPgExtras::TableInfo do
         expect(RubyPgExtras).to receive(:tables) {
           [
             { "schemaname" => "public", "tablename" => "users" },
-            { "schemaname" => "public", "tablename" => "teams" }
+            { "schemaname" => "public", "tablename" => "teams" },
           ]
         }
 
         expect(RubyPgExtras).to receive(:table_size) {
           [
             { "name" => "teams", "size" => "25 MB" },
-            {"name" => "users", "size" => "250 MB"},
+            { "name" => "users", "size" => "250 MB" },
           ]
         }
 

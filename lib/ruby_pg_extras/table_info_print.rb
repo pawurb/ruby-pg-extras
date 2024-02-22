@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'terminal-table'
+require "terminal-table"
 
 module RubyPgExtras
   class TableInfoPrint
@@ -17,7 +17,7 @@ module RubyPgExtras
           el.fetch(:indexes_cache_hit),
           el.fetch(:estimated_rows),
           el.fetch(:sequential_scans),
-          el.fetch(:indexes_scans)
+          el.fetch(:indexes_scans),
         ]
       end
 
@@ -29,10 +29,10 @@ module RubyPgExtras
           "Indexes cache hit",
           "Estimated rows",
           "Sequential scans",
-          "Indexes scans"
+          "Indexes scans",
         ],
         title: title,
-        rows: rows
+        rows: rows,
       )
     end
 

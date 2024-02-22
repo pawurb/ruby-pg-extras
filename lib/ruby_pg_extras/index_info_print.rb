@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'terminal-table'
+require "terminal-table"
 
 module RubyPgExtras
   class IndexInfoPrint
@@ -13,10 +13,10 @@ module RubyPgExtras
         [
           el.fetch(:index_name),
           el.fetch(:table_name),
-          el.fetch(:columns).join(', '),
+          el.fetch(:columns).join(", "),
           el.fetch(:index_size),
           el.fetch(:index_scans),
-          el.fetch(:null_frac)
+          el.fetch(:null_frac),
         ]
       end
 
@@ -27,10 +27,10 @@ module RubyPgExtras
           "Columns",
           "Index size",
           "Index scans",
-          "Null frac"
+          "Null frac",
         ],
         title: title,
-        rows: rows
+        rows: rows,
       )
     end
 

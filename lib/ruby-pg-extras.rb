@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require 'terminal-table'
-require 'uri'
-require 'pg'
-require 'ruby_pg_extras/size_parser'
-require 'ruby_pg_extras/diagnose_data'
-require 'ruby_pg_extras/diagnose_print'
-require 'ruby_pg_extras/index_info'
-require 'ruby_pg_extras/index_info_print'
-require 'ruby_pg_extras/table_info'
-require 'ruby_pg_extras/table_info_print'
+require "terminal-table"
+require "uri"
+require "pg"
+require "ruby_pg_extras/size_parser"
+require "ruby_pg_extras/diagnose_data"
+require "ruby_pg_extras/diagnose_print"
+require "ruby_pg_extras/index_info"
+require "ruby_pg_extras/index_info_print"
+require "ruby_pg_extras/table_info"
+require "ruby_pg_extras/table_info_print"
 
 module RubyPgExtras
   @@database_url = nil
@@ -27,7 +27,7 @@ module RubyPgExtras
     buffercache_usage ssl_used connections
   )
 
-  DEFAULT_SCHEMA = ENV["PG_EXTRAS_SCHEMA"] || 'public'
+  DEFAULT_SCHEMA = ENV["PG_EXTRAS_SCHEMA"] || "public"
 
   DEFAULT_ARGS = Hash.new({}).merge({
     calls: { limit: 10 },
@@ -50,7 +50,7 @@ module RubyPgExtras
     table_index_scans: { schema: DEFAULT_SCHEMA },
     records_rank: { schema: DEFAULT_SCHEMA },
     tables: { schema: DEFAULT_SCHEMA },
-    kill_pid: { pid: 0 }
+    kill_pid: { pid: 0 },
   })
 
   QUERIES.each do |query_name|
@@ -58,7 +58,7 @@ module RubyPgExtras
       run_query(
         query_name: query_name,
         in_format: options.fetch(:in_format, :display_table),
-        args: options.fetch(:args, {})
+        args: options.fetch(:args, {}),
       )
     end
   end
@@ -75,16 +75,16 @@ module RubyPgExtras
     end
 
     sql = if (custom_args = DEFAULT_ARGS[query_name].merge(args)) != {}
-      sql_for(query_name: query_name) % custom_args
-    else
-      sql_for(query_name: query_name)
-    end
+        sql_for(query_name: query_name) % custom_args
+      else
+        sql_for(query_name: query_name)
+      end
     result = connection.exec(sql)
 
     display_result(
       result,
       title: description_for(query_name: query_name),
-      in_format: in_format
+      in_format: in_format,
     )
   end
 
@@ -140,15 +140,15 @@ module RubyPgExtras
       result
     when :display_table
       headings = if result.count > 0
-        result[0].keys
-      else
-        ["No results"]
-      end
+          result[0].keys
+        else
+          ["No results"]
+        end
 
       puts Terminal::Table.new(
         title: title,
         headings: headings,
-        rows: result.values
+        rows: result.values,
       )
     else
       raise "Invalid in_format option"

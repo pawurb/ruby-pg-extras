@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe RubyPgExtras::SizeParser do
   subject(:result) { described_class.to_i(arg) }
 
-  describe 'SI Units' do
+  describe "SI Units" do
     let(:arg) { "#{num_units} #{unit}" }
 
     context "when the argument is a number followed by 'bytes', with possible case variations" do
@@ -72,7 +72,7 @@ describe RubyPgExtras::SizeParser do
     end
   end
 
-  describe 'Binary Units' do
+  describe "Binary Units" do
     let(:arg) { "#{num_units} #{unit}" }
 
     context "when the argument is a number followed by 'bytes', with possible case variations" do
@@ -139,28 +139,28 @@ describe RubyPgExtras::SizeParser do
     end
   end
 
-  context 'when the argument has only digits' do
-    let(:arg) { '654245' }
+  context "when the argument has only digits" do
+    let(:arg) { "654245" }
 
     it { is_expected.to eq(arg.to_i) }
   end
 
-  describe 'errors' do
-    it 'raises an error when the argument has an invalid prefix' do
+  describe "errors" do
+    it "raises an error when the argument has an invalid prefix" do
       expect do
-        described_class.to_i('123 qb')
+        described_class.to_i("123 qb")
       end.to raise_error ArgumentError
     end
 
-    it 'raises an error when the argument does not have a unit in bytes' do
+    it "raises an error when the argument does not have a unit in bytes" do
       expect do
-        described_class.to_i('123 mL')
+        described_class.to_i("123 mL")
       end.to raise_error ArgumentError
     end
 
-    it 'when the argument cannot be parsed an number of units' do
+    it "when the argument cannot be parsed an number of units" do
       expect do
-        described_class.to_i('1c3 MB')
+        described_class.to_i("1c3 MB")
       end.to raise_error ArgumentError
     end
   end
