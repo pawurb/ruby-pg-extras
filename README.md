@@ -441,7 +441,7 @@ This command displays the total size of each table and materialized view in the 
 
 ```ruby
 
-RubyPgExtras.unused_indexes(args: { max_scans: 20 })
+RubyPgExtras.unused_indexes(args: { max_scans: 50 })
 
           table      |                       index                | index_size | index_scans
 ---------------------+--------------------------------------------+------------+-------------
