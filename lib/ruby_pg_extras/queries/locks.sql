@@ -4,6 +4,8 @@ SELECT
   pg_stat_activity.pid,
   pg_class.relname,
   pg_locks.transactionid,
+  pg_locks.locktype,
+  pg_locks.database,
   pg_locks.granted,
   pg_locks.mode,
   pg_stat_activity.query AS query_snippet,
