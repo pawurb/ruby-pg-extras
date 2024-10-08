@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: ['3.2', '3.1', '3.0', '2.7', '2.6']
+        ruby-version: ['3.3', '3.2', '3.1', '3.0', '2.7', '2.6']
     steps:
       - uses: actions/checkout@v3
       - name: Run PostgreSQL 11
@@ -51,6 +51,22 @@ jobs:
             -d -p 5436:5432 postgres:15.1-alpine \
             postgres -c shared_preload_libraries=pg_stat_statements
           sleep 15
+      - name: Run PostgreSQL 16
+        run: |
+          docker run --env POSTGRES_USER=postgres \
+            --env POSTGRES_DB=ruby-pg-extras-test \
+            --env POSTGRES_PASSWORD=secret \
+            -d -p 5437:5432 postgres:16.4-alpine \
+            postgres -c shared_preload_libraries=pg_stat_statements
+          sleep 15
+      - name: Run PostgreSQL 17
+        run: |
+          docker run --env POSTGRES_USER=postgres \
+            --env POSTGRES_DB=ruby-pg-extras-test \
+            --env POSTGRES_PASSWORD=secret \
+            -d -p 5438:5432 postgres:17.0-alpine \
+            postgres -c shared_preload_libraries=pg_stat_statements
+          sleep 15
       - name: Set up Ruby ${{ matrix.ruby-version }}
         uses: ruby/setup-ruby@v1
         with:
@@ -64,16 +80,6 @@ jobs:
           bundle config set --local path 'vendor/bundle'
           bundle install
           sleep 10
-      - name: Run tests for PG 11
-        env:
-          PG_VERSION: 11
-          POSTGRES_HOST: localhost
-          POSTGRES_USER: postgres
-          POSTGRES_DB: ruby-pg-extras-test
-          POSTGRES_PASSWORD: secret
-          DATABASE_URL: postgresql://postgres:secret@localhost:5432/ruby-pg-extras-test
-        run: |
-          bundle exec rspec spec/
       - name: Run tests for PG 11
         env:
           PG_VERSION: 11
@@ -122,6 +128,26 @@ jobs:
           POSTGRES_DB: ruby-pg-extras-test
           POSTGRES_PASSWORD: secret
           DATABASE_URL: postgresql://postgres:secret@localhost:5436/ruby-pg-extras-test
+        run: |
+          bundle exec rspec spec/
+      - name: Run tests for PG 16
+        env:
+          PG_VERSION: 16
+          POSTGRES_HOST: localhost
+          POSTGRES_USER: postgres
+          POSTGRES_DB: ruby-pg-extras-test
+          POSTGRES_PASSWORD: secret
+          DATABASE_URL: postgresql://postgres:secret@localhost:5437/ruby-pg-extras-test
+        run: |
+          bundle exec rspec spec/
+      - name: Run tests for PG 17
+        env:
+          PG_VERSION: 17
+          POSTGRES_HOST: localhost
+          POSTGRES_USER: postgres
+          POSTGRES_DB: ruby-pg-extras-test
+          POSTGRES_PASSWORD: secret
+          DATABASE_URL: postgresql://postgres:secret@localhost:5438/ruby-pg-extras-test
         run: |
           bundle exec rspec spec/
 
