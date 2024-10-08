@@ -14,6 +14,7 @@ require "ruby_pg_extras/table_info_print"
 module RubyPgExtras
   @@database_url = nil
   NEW_PG_STAT_STATEMENTS = "1.8"
+  PG_STAT_STATEMENTS_17 = "1.11"
 
   QUERIES = %i(
     add_extensions bloat blocking cache_hit db_settings
@@ -32,11 +33,13 @@ module RubyPgExtras
   DEFAULT_ARGS = Hash.new({}).merge({
     calls: { limit: 10 },
     calls_legacy: { limit: 10 },
+    calls_17: { limit: 10 },
     long_running_queries: { threshold: "500 milliseconds" },
     locks: { limit: 20 },
     blocking: { limit: 20 },
     outliers: { limit: 10 },
     outliers_legacy: { limit: 10 },
+    outliers_17: { limit: 10 },
     buffercache_stats: { limit: 10 },
     buffercache_usage: { limit: 20 },
     unused_indexes: { max_scans: 50, schema: DEFAULT_SCHEMA },
@@ -70,6 +73,8 @@ module RubyPgExtras
       if pg_stat_statements_ver != nil
         if Gem::Version.new(pg_stat_statements_ver) < Gem::Version.new(NEW_PG_STAT_STATEMENTS)
           query_name = "#{query_name}_legacy".to_sym
+        elsif Gem::Version.new(pg_stat_statements_ver) >= Gem::Version.new(PG_STAT_STATEMENTS_17)
+          query_name = "#{query_name}_17".to_sym
         end
       end
     end
