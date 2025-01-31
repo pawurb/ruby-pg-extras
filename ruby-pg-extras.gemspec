@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
   s.add_development_dependency "rufo"
+  s.add_development_dependency "dbg-rb"
 
   if s.respond_to?(:metadata=)
     s.metadata = { "rubygems_mfa_required" => "true" }

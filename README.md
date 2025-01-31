@@ -116,6 +116,30 @@ Keep reading to learn about methods that `diagnose` uses under the hood.
 
 ## Available methods
 
+### `missing_fk_indexes`
+
+This method lists columns likely to be foreign keys (i.e. name ending in `_id`) but don't have a corresponding index. It's a generally recommended to always index foreign key columns because they are used for searching relation objects. 
+
+You can add indexes on the columns returned by this query and later check if they are receiving scans using the [unused_indexes method](#unused_indexes). Please also remember that each index decreases write performance and autovacuuming overhead, so be careful when adding multiple indexes to often updated tables.
+
+```ruby
+RubyPgExtras.missing_fk_indexes(args: { table_name: "users" })
+
+```
+
+`table_name` argument is optional, if omitted, the method will display missing fk indexes for all the tables.
+
+## `missing_fk_constraints`
+
+Similarly to the previous method, this one shows columns likely to be foreign keys (i.e. name ending in `_id`) that don't have a corresponding foreign key constraint. Foreign key constraints improve data integrity in the database by preventing relations with nonexisting objects. You can read more about the benefits of using foreign keys [in this blog post](https://pawelurbanek.com/rails-postgresql-data-integrity).
+
+```ruby
+RubyPgExtras.missing_fk_constraints(args: { table_name: "users" })
+
+```
+
+`table_name` argument is optional, if omitted, method will display missing foreign keys for all the tables.
+
 ### `table_info`
 
 This method displays metadata metrics for all or a selected table. You can use it to check the table's size, its cache hit metrics, and whether it is correctly indexed. Many sequential scans or no index scans are potential indicators of misconfigured indexes. This method aggregates data provided by other methods in an easy to analyze summary format.
@@ -126,6 +150,24 @@ RubyPgExtras.table_info(args: { table_name: "users" })
 | Table name | Table size | Table cache hit   | Indexes cache hit  | Estimated rows | Sequential scans | Indexes scans |
 +------------+------------+-------------------+--------------------+----------------+------------------+---------------+
 | users      | 2432 kB    | 0.999966685701511 | 0.9988780464661853 | 16650          | 2128             | 512496        |
+
+```
+
+### `table_schema`
+
+This method displays structure of a selected table, listing its column names, together with types, null constraints, and default values.
+
+```ruby
+RubyPgExtras.table_schema(args: { table_name: "users" })
+
+```
+
+### `table_foreign_keys`
+
+This method displays foreign key constraints for a selected table. It lists foreign key name, source and target columns, and related table name.
+
+```ruby
+RubyPgExtras.table_foreign_keys(args: { table_name: "users" })
 
 ```
 

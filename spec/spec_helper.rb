@@ -21,6 +21,28 @@ ENV["DATABASE_URL"] ||= "postgresql://postgres:secret@localhost:#{port}/ruby-pg-
 
 RSpec.configure do |config|
   config.before(:suite) do
+    DB_SCHEMA = <<-SQL
+DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255),
+    company_id INTEGER
+);
+
+CREATE TABLE posts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    topic_id INTEGER,
+    title VARCHAR(255),
+    CONSTRAINT fk_posts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX index_posts_on_user_id ON posts(user_id);
+SQL
+
+    RubyPgExtras.connection.exec(DB_SCHEMA)
     RubyPgExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS pg_stat_statements;")
     RubyPgExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS pg_buffercache;")
     RubyPgExtras.connection.exec("CREATE EXTENSION IF NOT EXISTS sslinfo;")

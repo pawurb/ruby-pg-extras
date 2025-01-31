@@ -6,6 +6,8 @@ require "pg"
 require "ruby_pg_extras/size_parser"
 require "ruby_pg_extras/diagnose_data"
 require "ruby_pg_extras/diagnose_print"
+require "ruby_pg_extras/missing_fk_indexes"
+require "ruby_pg_extras/missing_fk_constraints"
 require "ruby_pg_extras/index_info"
 require "ruby_pg_extras/index_info_print"
 require "ruby_pg_extras/table_info"
@@ -26,9 +28,15 @@ module RubyPgExtras
     unused_indexes duplicate_indexes vacuum_stats kill_all kill_pid
     pg_stat_statements_reset buffercache_stats
     buffercache_usage ssl_used connections
+    table_schema table_foreign_keys
   )
 
   DEFAULT_SCHEMA = ENV["PG_EXTRAS_SCHEMA"] || "public"
+
+  REQUIRED_ARGS = {
+    table_schema: [:table_name],
+    table_foreign_keys: [:table_name],
+  }
 
   DEFAULT_ARGS = Hash.new({}).merge({
     calls: { limit: 10 },
@@ -79,7 +87,13 @@ module RubyPgExtras
       end
     end
 
-    sql = if (custom_args = DEFAULT_ARGS[query_name].merge(args)) != {}
+    REQUIRED_ARGS.fetch(query_name) { [] }.each do |arg_name|
+      if args[arg_name].nil?
+        raise ArgumentError, "'#{arg_name}' is required"
+      end
+    end
+
+    sql = if (custom_args = DEFAULT_ARGS.fetch(query_name, {}).merge(args)) != {}
         sql_for(query_name: query_name) % custom_args
       else
         sql_for(query_name: query_name)
@@ -133,6 +147,14 @@ module RubyPgExtras
     else
       raise "Invalid 'in_format' argument!"
     end
+  end
+
+  def self.missing_fk_indexes(args: {}, in_format: :display_table)
+    RubyPgExtras::MissingFkIndexes.call(args[:table_name])
+  end
+
+  def self.missing_fk_constraints(args: {}, in_format: :display_table)
+    RubyPgExtras::MissingFkContraints.call(args[:table_name])
   end
 
   def self.display_result(result, title:, in_format:)
