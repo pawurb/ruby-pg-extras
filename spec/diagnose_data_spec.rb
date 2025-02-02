@@ -45,6 +45,20 @@ describe RubyPgExtras::DiagnoseData do
             { "query" => "SELECT * FROM users WHERE users.age > 20 AND users.height > 160", "exec_time" => "154:39:26.431466", "prop_exec_time" => "72.2%", "ncalls" => "34,211,877", "sync_io_time" => "00:34:19.784318" },
           ]
         }
+
+        expect(RubyPgExtras).to receive(:missing_fk_constraints) {
+          [
+            { table: "users", column_name: "company_id" },
+            { table: "posts", column_name: "topic_id" },
+          ]
+        }
+
+        expect(RubyPgExtras).to receive(:missing_fk_indexes) {
+          [
+            { table: "users", column_name: "company_id" },
+            { table: "posts", column_name: "topic_id" },
+          ]
+        }
       end
 
       it "works" do

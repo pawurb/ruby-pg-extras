@@ -23,6 +23,8 @@ module RubyPgExtras
         :null_indexes,
         :bloat,
         :duplicate_indexes,
+        :missing_fk_indexes,
+        :missing_fk_constraints,
       ].yield_self do |checks|
         extensions_data = query_module.extensions(in_format: :hash)
 
@@ -53,6 +55,46 @@ module RubyPgExtras
 
     def query_module
       RubyPgExtras
+    end
+
+    def missing_fk_indexes
+      missing = query_module.missing_fk_indexes(in_format: :hash)
+
+      if missing.count == 0
+        return {
+                 ok: true,
+                 message: "No missing foreign key indexes detected.",
+               }
+      end
+
+      missing_text = missing.map do |el|
+        "#{el.fetch(:table)}.#{el.fetch(:column_name)}"
+      end.join(",\n")
+
+      {
+        ok: false,
+        message: "Missing foreign key indexes detected: #{missing_text}.",
+      }
+    end
+
+    def missing_fk_constraints
+      missing = query_module.missing_fk_constraints(in_format: :hash)
+
+      if missing.count == 0
+        return {
+                 ok: true,
+                 message: "No missing foreign key constraints detected.",
+               }
+      end
+
+      missing_text = missing.map do |el|
+        "#{el.fetch(:table)}.#{el.fetch(:column_name)}"
+      end.join(",\n")
+
+      {
+        ok: false,
+        message: "Missing foreign key constraints detected: #{missing_text}.",
+      }
     end
 
     def table_cache_hit

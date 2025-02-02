@@ -10,7 +10,7 @@ module RubyPgExtras
       tables = if table_name
           [table_name]
         else
-          query_module.table_size(in_format: :hash).map { |row| row.fetch("name") }
+          all_tables
         end
 
       tables.reduce([]) do |agg, table|
@@ -18,7 +18,9 @@ module RubyPgExtras
         schema = query_module.table_schema(args: { table_name: table }, in_format: :hash)
 
         fk_columns = schema.filter_map do |row|
-          row.fetch("column_name") if row.fetch("column_name") =~ /_id$/
+          if DetectFkColumn.call(row.fetch("column_name"), all_tables)
+            row.fetch("column_name")
+          end
         end
 
         fk_columns.each do |column_name|
@@ -37,6 +39,10 @@ module RubyPgExtras
     end
 
     private
+
+    def all_tables
+      @_all_tables ||= query_module.table_size(in_format: :hash).map { |row| row.fetch("name") }
+    end
 
     def query_module
       RubyPgExtras

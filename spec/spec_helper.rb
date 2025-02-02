@@ -24,6 +24,8 @@ RSpec.configure do |config|
     DB_SCHEMA = <<-SQL
 DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS topics;
+DROP TABLE IF EXISTS companies;
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -35,8 +37,19 @@ CREATE TABLE posts (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     topic_id INTEGER,
+    external_id INTEGER,
     title VARCHAR(255),
     CONSTRAINT fk_posts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE topics (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255)
+);
+
+CREATE TABLE companies (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255)
 );
 
 CREATE INDEX index_posts_on_user_id ON posts(user_id);
