@@ -74,9 +74,9 @@ module RubyPgExtras
     end
   end
 
-  def self.run_query(query_name:, in_format:, args: {})
+  def self.run_query_base(query_name:, conn:, exec_method:, in_format:, args: {})
     if %i(calls outliers).include?(query_name)
-      pg_stat_statements_ver = RubyPgExtras.connection.exec("select installed_version from pg_available_extensions where name='pg_stat_statements'")
+      pg_stat_statements_ver = conn.send(exec_method, "select installed_version from pg_available_extensions where name='pg_stat_statements'")
         .to_a[0].fetch("installed_version", nil)
       if pg_stat_statements_ver != nil
         if Gem::Version.new(pg_stat_statements_ver) < Gem::Version.new(NEW_PG_STAT_STATEMENTS)
@@ -98,12 +98,22 @@ module RubyPgExtras
       else
         sql_for(query_name: query_name)
       end
-    result = connection.exec(sql)
+    result = conn.send(exec_method, sql)
 
     display_result(
       result,
       title: description_for(query_name: query_name),
       in_format: in_format,
+    )
+  end
+
+  def self.run_query(query_name:, in_format:, args: {})
+    run_query_base(
+      query_name: query_name,
+      conn: connection,
+      exec_method: :exec,
+      in_format: in_format,
+      args: args,
     )
   end
 
@@ -154,7 +164,7 @@ module RubyPgExtras
   end
 
   def self.missing_fk_constraints(args: {}, in_format: :display_table)
-    RubyPgExtras::MissingFkContraints.call(args[:table_name])
+    RubyPgExtras::MissingFkConstraints.call(args[:table_name])
   end
 
   def self.display_result(result, title:, in_format:)
@@ -175,7 +185,7 @@ module RubyPgExtras
       puts Terminal::Table.new(
         title: title,
         headings: headings,
-        rows: result.values,
+        rows: (result.try(:values) || result.map(&:values)),
       )
     else
       raise "Invalid in_format option"

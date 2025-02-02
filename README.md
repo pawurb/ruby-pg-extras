@@ -160,6 +160,14 @@ This method displays structure of a selected table, listing its column names, to
 ```ruby
 RubyPgExtras.table_schema(args: { table_name: "users" })
 
++-----------------------------+-----------------------------+-------------+-----------------------------------+
+| column_name                 | data_type                   | is_nullable | column_default                    |
++-----------------------------+-----------------------------+-------------+-----------------------------------+
+| id                          | bigint                      | NO          | nextval('users_id_seq'::regclass) |
+| team_id                     | integer                     | NO          |                                   |
+| slack_id                    | character varying           | NO          |                                   |
+| pseudonym                   | character varying           | YES         |                                   |
+
 ```
 
 ### `table_foreign_keys`
@@ -168,6 +176,12 @@ This method displays foreign key constraints for a selected table. It lists fore
 
 ```ruby
 RubyPgExtras.table_foreign_keys(args: { table_name: "users" })
+
++------------+---------------------+-------------+--------------------+---------------------+
+| table_name | constraint_name     | column_name | foreign_table_name | foreign_column_name |
++------------+---------------------+-------------+--------------------+---------------------+
+| users      | fk_rails_b2bbf87303 | team_id     | teams              | id                  |
++------------+---------------------+-------------+--------------------+---------------------+
 
 ```
 

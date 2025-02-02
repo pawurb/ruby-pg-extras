@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RubyPgExtras
-  class MissingFkContraints
+  class MissingFkConstraints
     def self.call(table_name)
       new.call(table_name)
     end
@@ -10,12 +10,12 @@ module RubyPgExtras
       tables = if table_name
           [table_name]
         else
-          RubyPgExtras.table_size(in_format: :hash).map { |row| row.fetch("name") }
+          query_module.table_size(in_format: :hash).map { |row| row.fetch("name") }
         end
 
       tables.reduce([]) do |agg, table|
-        foreign_keys_info = RubyPgExtras.table_foreign_keys(args: { table_name: table }, in_format: :hash)
-        schema = RubyPgExtras.table_schema(args: { table_name: table }, in_format: :hash)
+        foreign_keys_info = query_module.table_foreign_keys(args: { table_name: table }, in_format: :hash)
+        schema = query_module.table_schema(args: { table_name: table }, in_format: :hash)
 
         fk_columns = schema.filter_map do |row|
           row.fetch("column_name") if row.fetch("column_name") =~ /_id$/
@@ -34,6 +34,12 @@ module RubyPgExtras
 
         agg
       end
+    end
+
+    private
+
+    def query_module
+      RubyPgExtras
     end
   end
 end

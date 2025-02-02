@@ -10,12 +10,14 @@ module RubyPgExtras
       tables = if table_name
           [table_name]
         else
-          RubyPgExtras.table_size(in_format: :hash).map { |row| row.fetch("name") }
+          query_module.table_size(in_format: :hash).map { |row| row.fetch("name") }
         end
 
+      indexes_info = query_module.index_info(in_format: :hash)
+
       tables.reduce([]) do |agg, table|
-        index_info = RubyPgExtras.index_info(args: { table_name: table }, in_format: :hash)
-        schema = RubyPgExtras.table_schema(args: { table_name: table }, in_format: :hash)
+        index_info = indexes_info.select { |row| row.fetch(:table_name) == table }
+        schema = query_module.table_schema(args: { table_name: table }, in_format: :hash)
 
         fk_columns = schema.filter_map do |row|
           row.fetch("column_name") if row.fetch("column_name") =~ /_id$/
@@ -34,6 +36,12 @@ module RubyPgExtras
 
         agg
       end
+    end
+
+    private
+
+    def query_module
+      RubyPgExtras
     end
   end
 end
