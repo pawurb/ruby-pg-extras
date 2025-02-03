@@ -52,7 +52,7 @@ CREATE TABLE companies (
     name VARCHAR(255)
 );
 
-CREATE INDEX index_posts_on_user_id ON posts(user_id);
+CREATE INDEX index_posts_on_user_id ON posts(user_id, topic_id);
 SQL
 
     RubyPgExtras.connection.exec(DB_SCHEMA)

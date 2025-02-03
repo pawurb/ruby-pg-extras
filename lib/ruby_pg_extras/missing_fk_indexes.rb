@@ -13,10 +13,10 @@ module RubyPgExtras
           all_tables
         end
 
-      indexes_info = query_module.index_info(in_format: :hash)
+      indexes_info = query_module.indexes(in_format: :hash)
 
       tables.reduce([]) do |agg, table|
-        index_info = indexes_info.select { |row| row.fetch(:table_name) == table }
+        index_info = indexes_info.select { |row| row.fetch("tablename") == table }
         schema = query_module.table_schema(args: { table_name: table }, in_format: :hash)
 
         fk_columns = schema.filter_map do |row|
@@ -26,7 +26,7 @@ module RubyPgExtras
         end
 
         fk_columns.each do |column_name|
-          if index_info.none? { |row| row.fetch(:columns)[0] == column_name }
+          if index_info.none? { |row| row.fetch("columns").split(",").first == column_name }
             agg.push(
               {
                 table: table,
