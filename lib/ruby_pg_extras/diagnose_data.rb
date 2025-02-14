@@ -17,14 +17,16 @@ module RubyPgExtras
 
     def call
       [
+        :missing_fk_indexes,
+        :missing_fk_constraints,
+        :random_page_cost,
+        :work_mem,
         :table_cache_hit,
         :index_cache_hit,
         :unused_indexes,
         :null_indexes,
         :bloat,
         :duplicate_indexes,
-        :missing_fk_indexes,
-        :missing_fk_constraints,
       ].yield_self do |checks|
         extensions_data = query_module.extensions(in_format: :hash)
 
@@ -55,6 +57,51 @@ module RubyPgExtras
 
     def query_module
       RubyPgExtras
+    end
+
+    def work_mem
+      db_settings = query_module.db_settings(in_format: :hash)
+
+      work_mem_val = db_settings.find do |el|
+        el.fetch("name") == "work_mem"
+      end
+
+      value = work_mem_val.fetch("setting")
+      unit = work_mem_val.fetch("unit")
+
+      if value == "4096" && unit == "kB"
+        {
+          ok: false,
+          message: "It looks like the db is using the default 'work_mem' value of '#{value}#{unit}'. This value is often too low for modern hardware and can result in suboptimal query plans. Visit https://pgtune.leopard.in.ua/ to find the correct value for your database.",
+        }
+      else
+        {
+          ok: true,
+          message: "'work_mem' is set to the value of '#{value}#{unit}'. You can check https://pgtune.leopard.in.ua/ to confirm if this is the correct value for your database.",
+        }
+      end
+    end
+
+    def random_page_cost
+      db_settings = query_module.db_settings(in_format: :hash)
+
+      random_page_cost_val = db_settings.find do |el|
+        el.fetch("name") == "random_page_cost"
+      end
+
+      value = random_page_cost_val.fetch("setting")
+
+      if value == "4"
+        {
+          ok: false,
+          message: "It looks like the db is using the default 'random_page_cost' value of '4'. This value is often too low for modern hardware and can result in suboptimal indexes utilization. Consider setting it to '1.1'. See https://pgtune.leopard.in.ua/ for more information.",
+        }
+      else
+        {
+          ok: true,
+          message: "'random_page_cost' is set to the value of '#{value}'. You can check https://pgtune.leopard.in.ua/ to confirm if this is the correct value for your database.",
+        }
+      end
     end
 
     def missing_fk_indexes
