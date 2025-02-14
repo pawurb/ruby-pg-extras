@@ -72,7 +72,7 @@ module RubyPgExtras
       if value == "4096" && unit == "kB"
         {
           ok: false,
-          message: "It looks like the db is using the default 'work_mem' value of '#{value}#{unit}'. This value is often too low for modern hardware and can result in suboptimal query plans. Visit https://pgtune.leopard.in.ua/ to find the correct value for your database.",
+          message: "The db is using the default 'work_mem' value of '#{value}#{unit}'. This value is often too low for modern hardware and can result in suboptimal query plans. Visit https://pgtune.leopard.in.ua/ to find the correct value for your database.",
         }
       else
         {
@@ -94,7 +94,7 @@ module RubyPgExtras
       if value == "4"
         {
           ok: false,
-          message: "It looks like the db is using the default 'random_page_cost' value of '4'. This value is often too low for modern hardware and can result in suboptimal indexes utilization. Consider setting it to '1.1'. See https://pgtune.leopard.in.ua/ for more information.",
+          message: "The db is using the default 'random_page_cost' value of '4'. This value is often too low for modern hardware and can result in suboptimal indexes utilization. Consider setting it to '1.1'. See https://pgtune.leopard.in.ua/ for more information.",
         }
       else
         {
