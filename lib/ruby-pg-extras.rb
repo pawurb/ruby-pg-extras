@@ -56,6 +56,7 @@ module RubyPgExtras
     index_usage: { schema: DEFAULT_SCHEMA },
     index_cache_hit: { schema: DEFAULT_SCHEMA },
     table_cache_hit: { schema: DEFAULT_SCHEMA },
+    table_size: { schema: DEFAULT_SCHEMA },
     index_scans: { schema: DEFAULT_SCHEMA },
     cache_hit: { schema: DEFAULT_SCHEMA },
     seq_scans: { schema: DEFAULT_SCHEMA },
