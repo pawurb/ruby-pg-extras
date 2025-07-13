@@ -364,19 +364,19 @@ This command displays all the current locks, regardless of their type.
 
 RubyPgExtras.outliers(args: { limit: 20 })
 
-                   query                 |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
------------------------------------------+------------------+----------------+-------------+--------------
- SELECT * FROM archivable_usage_events.. | 154:39:26.431466 | 72.2%          | 34,211,877  | 00:00:00
- COPY public.archivable_usage_events (.. | 50:38:33.198418  | 23.6%          | 13          | 13:34:21.00108
- COPY public.usage_events (id, reporte.. | 02:32:16.335233  | 1.2%           | 13          | 00:34:19.784318
- INSERT INTO usage_events (id, retaine.. | 01:42:59.436532  | 0.8%           | 12,328,187  | 00:00:00
- SELECT * FROM usage_events WHERE (alp.. | 01:18:10.754354  | 0.6%           | 102,114,301 | 00:00:00
- UPDATE usage_events SET reporter_id =.. | 00:52:35.683254  | 0.4%           | 23,786,348  | 00:00:00
- INSERT INTO usage_events (id, retaine.. | 00:49:24.952561  | 0.4%           | 21,988,201  | 00:00:00
+                   query                 |    exec_time     | prop_exec_time |   ncalls    | avg_exec_ms | sync_io_time
+-----------------------------------------+------------------+----------------+-------------+-------------+--------------
+ SELECT * FROM archivable_usage_events.. | 154:39:26.431466 | 72.2%          | 34,211,877  | 16          | 00:00:00
+ COPY public.archivable_usage_events (.. | 50:38:33.198418  | 23.6%          | 13          | 14014481    | 13:34:21.00108
+ COPY public.usage_events (id, reporte.. | 02:32:16.335233  | 1.2%           | 13          | 70332       | 00:34:19.784318
+ INSERT INTO usage_events (id, retaine.. | 01:42:59.436532  | 0.8%           | 12,328,187  | 0           | 00:00:00
+ SELECT * FROM usage_events WHERE (alp.. | 01:18:10.754354  | 0.6%           | 102,114,301 | 0           | 00:00:00
+ UPDATE usage_events SET reporter_id =.. | 00:52:35.683254  | 0.4%           | 23,786,348  | 0           | 00:00:00
+ INSERT INTO usage_events (id, retaine.. | 00:49:24.952561  | 0.4%           | 21,988,201  | 0           | 00:00:00
 (truncated results for brevity)
 ```
 
-This command displays statements, obtained from `pg_stat_statements`, ordered by the amount of time to execute in aggregate. This includes the statement itself, the total execution time for that statement, the proportion of total execution time for all statements that statement has taken up, the number of times that statement has been called, and the amount of time that statement spent on synchronous I/O (reading/writing from the file system).
+This command displays statements, obtained from `pg_stat_statements`, ordered by the amount of time to execute in aggregate. This includes the statement itself, the total execution time for that statement, the proportion of total execution time for all statements that statement has taken up, the number of times that statement has been called, the average execution time per call in milliseconds, and the amount of time that statement spent on synchronous I/O (reading/writing from the file system).
 
 Typically, an efficient query will have an appropriate ratio of calls to total execution time, with as little time spent on I/O as possible. Queries that have a high total execution time but low call count should be investigated to improve their performance. Queries that have a high proportion of execution time being spent on synchronous I/O should also be investigated.
 
@@ -388,15 +388,15 @@ Typically, an efficient query will have an appropriate ratio of calls to total e
 
 RubyPgExtras.calls(args: { limit: 10 })
 
-                   qry                   |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
------------------------------------------+------------------+----------------+-------------+--------------
- SELECT * FROM usage_events WHERE (alp.. | 01:18:11.073333  | 0.6%           | 102,120,780 | 00:00:00
- BEGIN                                   | 00:00:51.285988  | 0.0%           | 47,288,662  | 00:00:00
- COMMIT                                  | 00:00:52.31724   | 0.0%           | 47,288,615  | 00:00:00
- SELECT * FROM  archivable_usage_event.. | 154:39:26.431466 | 72.2%          | 34,211,877  | 00:00:00
- UPDATE usage_events SET reporter_id =.. | 00:52:35.986167  | 0.4%           | 23,788,388  | 00:00:00
- INSERT INTO usage_events (id, retaine.. | 00:49:25.260245  | 0.4%           | 21,990,326  | 00:00:00
- INSERT INTO usage_events (id, retaine.. | 01:42:59.436532  | 0.8%           | 12,328,187  | 00:00:00
+                   qry                   |    exec_time     | prop_exec_time |   ncalls    | avg_exec_ms | sync_io_time
+-----------------------------------------+------------------+----------------+-------------+-------------+--------------
+ SELECT * FROM usage_events WHERE (alp.. | 01:18:11.073333  | 0.6%           | 102,120,780 | 0           | 00:00:00
+ BEGIN                                   | 00:00:51.285988  | 0.0%           | 47,288,662  | 0           | 00:00:00
+ COMMIT                                  | 00:00:52.31724   | 0.0%           | 47,288,615  | 0           | 00:00:00
+ SELECT * FROM  archivable_usage_event.. | 154:39:26.431466 | 72.2%          | 34,211,877  | 16          | 00:00:00
+ UPDATE usage_events SET reporter_id =.. | 00:52:35.986167  | 0.4%           | 23,788,388  | 0           | 00:00:00
+ INSERT INTO usage_events (id, retaine.. | 00:49:25.260245  | 0.4%           | 21,990,326  | 0           | 00:00:00
+ INSERT INTO usage_events (id, retaine.. | 01:42:59.436532  | 0.8%           | 12,328,187  | 0           | 00:00:00
 (truncated results for brevity)
 ```
 
