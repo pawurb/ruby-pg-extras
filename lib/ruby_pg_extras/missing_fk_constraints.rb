@@ -13,9 +13,12 @@ module RubyPgExtras
           all_tables
         end
 
+      schemas = query_module.table_schemas(in_format: :hash)
+      foreign_keys = query_module.foreign_keys(in_format: :hash)
+
       tables.reduce([]) do |agg, table|
-        foreign_keys_info = query_module.table_foreign_keys(args: { table_name: table }, in_format: :hash)
-        schema = query_module.table_schema(args: { table_name: table }, in_format: :hash)
+        schema = schemas.select { |row| row.fetch("table_name") == table }
+        fk_columns = foreign_keys.select { |row| row.fetch("table_name") == table }
 
         fk_columns = schema.filter_map do |row|
           if DetectFkColumn.call(row.fetch("column_name"), all_tables)
@@ -24,7 +27,7 @@ module RubyPgExtras
         end
 
         fk_columns.each do |column_name|
-          if foreign_keys_info.none? { |row| row.fetch("column_name") == column_name }
+          if foreign_keys.none? { |row| row.fetch("column_name") == column_name }
             agg.push(
               {
                 table: table,

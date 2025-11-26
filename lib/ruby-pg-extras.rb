@@ -29,7 +29,8 @@ module RubyPgExtras
     unused_indexes duplicate_indexes vacuum_stats kill_all kill_pid
     pg_stat_statements_reset buffercache_stats
     buffercache_usage ssl_used connections
-    table_schema table_foreign_keys
+    table_schema table_schemas
+    table_foreign_keys foreign_keys
   )
 
   DEFAULT_SCHEMA = ENV["PG_EXTRAS_SCHEMA"] || "public"
@@ -57,12 +58,14 @@ module RubyPgExtras
     index_cache_hit: { schema: DEFAULT_SCHEMA },
     table_cache_hit: { schema: DEFAULT_SCHEMA },
     table_size: { schema: DEFAULT_SCHEMA },
+    table_schemas: { schema: DEFAULT_SCHEMA },
     index_scans: { schema: DEFAULT_SCHEMA },
     cache_hit: { schema: DEFAULT_SCHEMA },
     seq_scans: { schema: DEFAULT_SCHEMA },
     table_index_scans: { schema: DEFAULT_SCHEMA },
     records_rank: { schema: DEFAULT_SCHEMA },
     tables: { schema: DEFAULT_SCHEMA },
+    foreign_keys: { schema: DEFAULT_SCHEMA },
     kill_pid: { pid: 0 },
   })
 
