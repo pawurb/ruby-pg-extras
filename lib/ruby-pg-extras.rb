@@ -92,6 +92,15 @@ module RubyPgExtras
       end
     end
 
+    # vacuum_stats has a PG13+ variant that uses insert-based autovacuum fields.
+    # For PG12 and below we fall back to vacuum_stats_legacy that only relies on dead tuples.
+    if query_name == :vacuum_stats
+      server_version_num = conn.send(exec_method, "SHOW server_version_num").to_a[0].values[0].to_i
+      if server_version_num < 130000
+        query_name = :vacuum_stats_legacy
+      end
+    end
+
     REQUIRED_ARGS.fetch(query_name) { [] }.each do |arg_name|
       if args[arg_name].nil?
         raise ArgumentError, "'#{arg_name}' is required"
