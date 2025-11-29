@@ -7,7 +7,6 @@ require_relative "../lib/ruby-pg-extras"
 pg_version = ENV["PG_VERSION"]
 
 PG_PORTS = {
-  "12" => "5432",
   "13" => "5433",
   "14" => "5434",
   "15" => "5435",
