@@ -1,13 +1,4 @@
 services:
-  postgres12:
-    image: postgres:12.20-alpine
-    command: postgres -c shared_preload_libraries=pg_stat_statements
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: ruby-pg-extras-test
-      POSTGRES_PASSWORD: secret
-    ports:
-      - '5432:5432'
   postgres13:
     image: postgres:13.16-alpine
     command: postgres -c shared_preload_libraries=pg_stat_statements
