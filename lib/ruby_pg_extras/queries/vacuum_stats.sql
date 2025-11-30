@@ -1,4 +1,4 @@
-/* Dead rows and whether an automatic vacuum is expected to be triggered */
+/* Dead rows, new inserts since last VACUUM and whether an automatic vacuum is expected to be triggered */
 
 WITH table_opts AS (
   SELECT
@@ -34,8 +34,10 @@ WITH table_opts AS (
 SELECT
   vacuum_settings.nspname AS schema,
   vacuum_settings.relname AS table,
-  to_char(psut.last_vacuum, 'YYYY-MM-DD HH24:MI') AS last_vacuum,
+  to_char(psut.last_vacuum, 'YYYY-MM-DD HH24:MI') AS last_manual_vacuum,
+  to_char(psut.vacuum_count, '9G999G999G999') AS manual_vacuum_count,
   to_char(psut.last_autovacuum, 'YYYY-MM-DD HH24:MI') AS last_autovacuum,
+  to_char(psut.autovacuum_count, '9G999G999G999') AS autovacuum_count,
   to_char(pg_class.reltuples, '9G999G999G999') AS rowcount,
   to_char(psut.n_dead_tup, '9G999G999G999') AS dead_rowcount,
   to_char(

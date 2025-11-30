@@ -15,7 +15,8 @@ SELECT
   fsyncs,
   fsync_time,
   reuses,
-  evictions
+  evictions,
+  stats_reset
 FROM
   pg_stat_io
 WHERE
