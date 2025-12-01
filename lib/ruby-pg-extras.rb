@@ -26,7 +26,9 @@ module RubyPgExtras
     long_running_queries mandelbrot outliers
     records_rank seq_scans table_index_scans table_indexes_size
     table_size total_index_size total_table_size
-    unused_indexes duplicate_indexes vacuum_stats kill_all kill_pid
+    unused_indexes duplicate_indexes vacuum_stats vacuum_progress vacuum_io_stats
+    analyze_progress
+    kill_all kill_pid
     pg_stat_statements_reset buffercache_stats
     buffercache_usage ssl_used connections
     table_schema table_schemas
@@ -50,6 +52,11 @@ module RubyPgExtras
     outliers: { limit: 10 },
     outliers_legacy: { limit: 10 },
     outliers_17: { limit: 10 },
+    vacuum_progress: {},
+    vacuum_progress_17: {},
+    vacuum_io_stats: {},
+    vacuum_io_stats_legacy: {},
+    analyze_progress: {},
     buffercache_stats: { limit: 10 },
     buffercache_usage: { limit: 20 },
     unused_indexes: { max_scans: 50, schema: DEFAULT_SCHEMA },
@@ -89,6 +96,25 @@ module RubyPgExtras
         elsif Gem::Version.new(pg_stat_statements_ver) >= Gem::Version.new(PG_STAT_STATEMENTS_17)
           query_name = "#{query_name}_17".to_sym
         end
+      end
+    end
+
+    # vacuum_progress uses pg_stat_progress_vacuum only and does not depend on pg_stat_statements,
+    # so we switch it based on the server_version_num instead of the pg_stat_statements version.
+    if query_name == :vacuum_progress
+      server_version_num = conn.send(exec_method, "SHOW server_version_num").to_a[0].values[0].to_i
+      if server_version_num >= 170000
+        query_name = :vacuum_progress_17
+      end
+    end
+
+    # vacuum_io_stats relies on pg_stat_io which is available starting from PostgreSQL 16.
+    # For older versions we fall back to vacuum_io_stats_legacy which just indicates
+    # that this feature is not available on the current server.
+    if query_name == :vacuum_io_stats
+      server_version_num = conn.send(exec_method, "SHOW server_version_num").to_a[0].values[0].to_i
+      if server_version_num < 160000
+        query_name = :vacuum_io_stats_legacy
       end
     end
 

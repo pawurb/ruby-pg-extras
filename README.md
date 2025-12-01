@@ -647,17 +647,60 @@ This command displays an estimation of table "bloat" – space allocated to a re
 
 RubyPgExtras.vacuum_stats
 
- schema |         table         | last_vacuum | last_autovacuum  |    rowcount    | dead_rowcount  | autovacuum_threshold | expect_autovacuum
---------+-----------------------+-------------+------------------+----------------+----------------+----------------------+-------------------
- public | log_table             |             | 2013-04-26 17:37 |         18,030 |              0 |          3,656       |
- public | data_table            |             | 2013-04-26 13:09 |             79 |             28 |             66       |
- public | other_table           |             | 2013-04-26 11:41 |             41 |             47 |             58       |
- public | queue_table           |             | 2013-04-26 17:39 |             12 |          8,228 |             52       | yes
- public | picnic_table          |             |                  |             13 |              0 |             53       |
+ schema |         table         | last_manual_vacuum | manual_vacuum_count | last_autovacuum  | autovacuum_count |    rowcount    | dead_rowcount  | dead_tup_autovacuum_threshold | n_ins_since_vacuum | insert_autovacuum_threshold | expect_autovacuum
+--------+-----------------------+--------------------+---------------------+------------------+------------------+----------------+----------------+-------------------------------+--------------------+-----------------------------+-------------------
+ public | log_table             |                    |                   0 | 2013-04-26 17:37 |                5 |         18,030 |              0 |                       3,656   |                  0 |                         3,606 | 
+ public | data_table            |                    |                   0 | 2013-04-26 13:09 |                3 |             79 |             28 |                          66   |                 10 |                            16 | yes (dead_tuples)
+ public | other_table           |                    |                   0 | 2013-04-26 11:41 |                4 |             41 |             47 |                          58   |              2,000 |                           1,008 | yes (dead_tuples & inserts)
  (truncated results for brevity)
 ```
 
-This command displays statistics related to vacuum operations for each table, including an estimation of dead rows, last autovacuum and the current autovacuum threshold. This command can be useful when determining if current vacuum thresholds require adjustments, and to determine when the table was last vacuumed.
+This command displays statistics related to vacuum operations for each table, including last manual vacuum and autovacuum timestamps and counters, an estimation of dead rows, dead-tuple-based autovacuum threshold, number of rows inserted since the last VACUUM (`n_ins_since_vacuum`) and the insert-based autovacuum threshold introduced in PostgreSQL 13 ([PostgreSQL autovacuum configuration](https://www.postgresql.org/docs/current/runtime-config-vacuum.html#RUNTIME-CONFIG-AUTOVACUUM)). It helps determine if current autovacuum thresholds (both dead-tuple and insert-based) are appropriate, and whether an automatic vacuum is expected to be triggered soon.
+
+### `vacuum_progress`
+
+```ruby
+
+RubyPgExtras.vacuum_progress
+
+ database | schema |  table   |  pid  |        phase        | heap_blks_total | heap_blks_scanned | heap_blks_vacuumed | index_vacuum_count
+----------+--------+----------+-------+---------------------+-----------------+-------------------+--------------------+--------------------
+ app_db   | public | users    | 12345 | scanning heap       |          125000 |             32000 |                  0 |                  0
+ app_db   | public | orders   | 12346 | vacuuming indexes   |           80000 |             80000 |              75000 |                  3
+ (truncated results for brevity)
+```
+
+This command shows the current progress of `VACUUM` / autovacuum operations by reading `pg_stat_progress_vacuum` ([VACUUM progress reporting docs](https://www.postgresql.org/docs/current/progress-reporting.html#VACUUM-PROGRESS-REPORTING)). It can be used to see which tables are being vacuumed right now, how far each operation has progressed, and how many index vacuum cycles have been performed.
+
+### `analyze_progress`
+
+```ruby
+
+RubyPgExtras.analyze_progress
+
+ database | schema |  table   |  pid  |        phase         | sample_blks_total | sample_blks_scanned | ext_stats_total | ext_stats_computed
+----------+--------+----------+-------+----------------------+-------------------+---------------------+-----------------+--------------------
+ app_db   | public | users    | 22345 | acquiring sample rows|              5000 |                 1200 |               2 |                   0
+ app_db   | public | orders   | 22346 | computing statistics |              8000 |                 8000 |               1 |                   1
+ (truncated results for brevity)
+```
+
+This command displays the current progress of `ANALYZE` and auto-analyze operations using `pg_stat_progress_analyze` ([ANALYZE progress reporting docs](https://www.postgresql.org/docs/current/progress-reporting.html#ANALYZE-PROGRESS-REPORTING)). It helps understand how far statistics collection has progressed for each active analyze and whether extended statistics are being computed.
+
+### `vacuum_io_stats`
+
+```ruby
+
+RubyPgExtras.vacuum_io_stats
+
+    backend_type    | object   | context  |  reads  | writes  | writebacks | extends | evictions | reuses  | fsyncs |  stats_reset
+--------------------+----------+----------+---------+---------+-----------+---------+-----------+---------+--------+-------------------------------
+ autovacuum worker  | relation | vacuum   | 5824251 | 3028684 |         0 |       0 |      2588 | 5821460 |      0 | 2025-01-10 11:50:27.583875+00
+ autovacuum launcher| relation | autovacuum|   16306 |    2494 |         0 |    2915 |     17785 |       0 |      0 | 2025-01-10 11:50:27.583875+00
+ (truncated results for brevity)
+```
+
+This command surfaces cumulative I/O statistics for autovacuum-related VACUUM activity, based on the `pg_stat_io` view introduced in PostgreSQL 16 ([pg_stat_io documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW)). It shows how many blocks autovacuum workers have read and written, how many buffer evictions and ring-buffer reuses occurred, and when the statistics were last reset; this is useful for determining whether autovacuum is responsible for I/O spikes, as described in the pganalyze article on `pg_stat_io` ([Tracking cumulative I/O activity by autovacuum and manual VACUUMs](https://pganalyze.com/blog/pg-stat-io#tracking-cumulative-io-activity-by-autovacuum-and-manual-vacuums)). On PostgreSQL versions below 16 this method returns a single informational row indicating that the feature is unavailable.
 
 ### `kill_all`
 
