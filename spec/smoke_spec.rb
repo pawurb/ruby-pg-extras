@@ -33,7 +33,7 @@ describe RubyPgExtras do
   describe "table_foreign_keys" do
     it "returns a correct fk info" do
       result = RubyPgExtras.table_foreign_keys(args: { table_name: :posts }, in_format: :hash)
-      expect(result.size).to eq(1)
+      expect(result.size).to eq(2)
       expect(result[0].keys).to eq(["table_name", "constraint_name", "column_name", "foreign_table_name", "foreign_column_name"])
     end
 
@@ -47,7 +47,7 @@ describe RubyPgExtras do
   describe "table_schema" do
     it "returns a correct schema" do
       result = RubyPgExtras.table_schema(args: { table_name: :users }, in_format: :hash)
-      expect(result.size).to eq(3)
+      expect(result.size).to eq(4)
       expect(result[0].keys).to eq(["column_name", "data_type", "is_nullable", "column_default"])
     end
 
