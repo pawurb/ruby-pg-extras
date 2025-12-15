@@ -7,6 +7,7 @@ require "ruby_pg_extras/size_parser"
 require "ruby_pg_extras/diagnose_data"
 require "ruby_pg_extras/diagnose_print"
 require "ruby_pg_extras/detect_fk_column"
+require "ruby_pg_extras/ignore_list"
 require "ruby_pg_extras/missing_fk_indexes"
 require "ruby_pg_extras/missing_fk_constraints"
 require "ruby_pg_extras/index_info"
@@ -195,7 +196,7 @@ module RubyPgExtras
   end
 
   def self.missing_fk_constraints(args: {}, in_format: :display_table)
-    RubyPgExtras::MissingFkConstraints.call(args[:table_name])
+    RubyPgExtras::MissingFkConstraints.call(args[:table_name], ignore_list: args[:ignore_list])
   end
 
   def self.display_result(result, title:, in_format:)

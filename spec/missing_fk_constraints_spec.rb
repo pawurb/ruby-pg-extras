@@ -31,4 +31,26 @@ describe "#missing_fk_constraints" do
     result = RubyPgExtras.missing_fk_constraints(args: { table_name: "events" }, in_format: :hash)
     expect(result).to eq([])
   end
+
+  it "supports ignoring a specific table+column via args" do
+    result = RubyPgExtras.missing_fk_constraints(
+      args: { ignore_list: ["posts.category_id"] },
+      in_format: :hash
+    )
+
+    expect(result).to eq([
+      { table: "users", column_name: "customer_id" },
+    ])
+  end
+
+  it "supports ignoring a column name globally via args" do
+    result = RubyPgExtras.missing_fk_constraints(
+      args: { ignore_list: ["customer_id"] },
+      in_format: :hash
+    )
+
+    expect(result).to eq([
+      { table: "posts", column_name: "category_id" },
+    ])
+  end
 end
