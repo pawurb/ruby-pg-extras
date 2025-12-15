@@ -19,4 +19,16 @@ describe "#missing_fk_constraints" do
       { table: "posts", column_name: "category_id" },
     ])
   end
+
+  it "does not report columns that already have foreign key constraints" do
+    result = RubyPgExtras.missing_fk_constraints(args: { table_name: "users" }, in_format: :hash)
+    expect(result).to eq([
+      { table: "users", column_name: "customer_id" },
+    ])
+  end
+
+  it "does not report polymorphic associations (<name>_id with <name>_type)" do
+    result = RubyPgExtras.missing_fk_constraints(args: { table_name: "events" }, in_format: :hash)
+    expect(result).to eq([])
+  end
 end

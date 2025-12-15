@@ -23,6 +23,8 @@ RSpec.configure do |config|
     DB_SCHEMA = <<-SQL
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS subjects;
 DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS topics;
@@ -65,6 +67,17 @@ CREATE TABLE customers (
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255)
+);
+
+CREATE TABLE subjects (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255)
+);
+
+CREATE TABLE events (
+    id SERIAL PRIMARY KEY,
+    subject_id INTEGER,
+    subject_type VARCHAR(255)
 );
 
 CREATE INDEX index_posts_on_user_id ON posts(user_id, topic_id);
