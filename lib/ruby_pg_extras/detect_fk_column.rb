@@ -34,16 +34,25 @@ module RubyPgExtras
     end
 
     def call(column_name, tables)
-      return false unless column_name =~ /_id$/
-      table_name = column_name.split("_").first
-      table_name = pluralize(table_name)
-      tables.include?(table_name)
+      # Heuristic: Rails-style foreign keys are usually named `<table_singular>_id`.
+      # We accept underscores in the prefix (e.g. `account_user_id` -> `account_users`).
+      match = /\A(?<table_singular>.+)_id\z/i.match(column_name.to_s)
+      return false unless match
+
+      table_singular = match[:table_singular]
+      return false if table_singular.empty?
+
+      tables.include?(pluralize(table_singular))
     end
 
     def pluralize(word)
-      return word if UNCOUNTABLE.include?(word.downcase)
-      return IRREGULAR[word] if IRREGULAR.key?(word)
-      return IRREGULAR.invert[word] if IRREGULAR.value?(word)
+      # Table names from Postgres are typically lowercase. Normalize before applying rules.
+      word = word.to_s.downcase
+
+      return word if UNCOUNTABLE.include?(word)
+      return IRREGULAR.fetch(word) if IRREGULAR.key?(word)
+      # If the word is already an irregular plural (e.g. "people"), keep it as-is.
+      return word if IRREGULAR.value?(word)
 
       PLURAL_RULES.reverse.each do |(rule, replacement)|
         return word.gsub(rule, replacement) if word.match?(rule)
