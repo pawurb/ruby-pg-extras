@@ -118,7 +118,7 @@ Keep reading to learn about methods that `diagnose` uses under the hood.
 
 ### `missing_fk_indexes`
 
-This method lists columns likely to be foreign keys (i.e. column name ending in `_id` and related table exists) which don't have an index. It's recommended to always index foreign key columns because they are used for searching relation objects. 
+This method lists **actual foreign key columns** (based on existing foreign key constraints) which don't have a supporting index. It's recommended to always index foreign key columns because they are commonly used for lookups and join conditions.
 
 You can add indexes on the columns returned by this query and later check if they are receiving scans using the [unused_indexes method](#unused_indexes). Please remember that each index decreases write performance and autovacuuming overhead, so be careful when adding multiple indexes to often updated tables.
 
@@ -140,10 +140,20 @@ RubyPgExtras.missing_fk_indexes(args: { table_name: "users" })
 
 ## `missing_fk_constraints`
 
-Similarly to the previous method, this one shows columns likely to be foreign keys that don't have a corresponding foreign key constraint. Foreign key constraints improve data integrity in the database by preventing relations with nonexisting objects. You can read more about the benefits of using foreign keys [in this blog post](https://pawelurbanek.com/rails-postgresql-data-integrity).
+This method shows **columns that look like foreign keys** but don't have a corresponding foreign key constraint yet. Foreign key constraints improve data integrity in the database by preventing relations with nonexisting objects. You can read more about the benefits of using foreign keys [in this blog post](https://pawelurbanek.com/rails-postgresql-data-integrity).
+
+Heuristic notes:
+- A column is considered a candidate if it matches `<table_singular>_id` and the related table exists (underscored prefixes like `account_user_id` are supported).
+- Rails polymorphic associations (`<name>_id` + `<name>_type`) are ignored since they cannot be expressed as real FK constraints.
+
+You can also exclude known/intentional cases using `ignore_list` (array or comma-separated string), with entries like:
+- `"posts.category_id"` (ignore a specific table+column)
+- `"category_id"` (ignore this column name for all tables)
+- `"posts.*"` (ignore all columns on a table)
+- `"*"` (ignore everything)
 
 ```ruby
-RubyPgExtras.missing_fk_constraints(args: { table_name: "users" })
+RubyPgExtras.missing_fk_constraints(args: { table_name: "users", ignore_list: ["users.customer_id", "posts.*"] })
 
 +---------------------------------+
 | Missing foreign key constraints |
