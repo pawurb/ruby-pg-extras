@@ -7,26 +7,22 @@ module RubyPgExtras
     end
 
     def call(table_name)
+      indexes_info = query_module.indexes(in_format: :hash)
+      foreign_keys = query_module.foreign_keys(in_format: :hash)
+
       tables = if table_name
           [table_name]
         else
-          all_tables
+          foreign_keys.map { |row| row.fetch("table_name") }.uniq
         end
-
-      indexes_info = query_module.indexes(in_format: :hash)
-      schemas = query_module.table_schemas(in_format: :hash)
 
       tables.reduce([]) do |agg, table|
         index_info = indexes_info.select { |row| row.fetch("tablename") == table }
-        schema = schemas.select { |row| row.fetch("table_name") == table }
+        table_fks = foreign_keys.select { |row| row.fetch("table_name") == table }
 
-        fk_columns = schema.filter_map do |row|
-          if DetectFkColumn.call(row.fetch("column_name"), all_tables)
-            row.fetch("column_name")
-          end
-        end
+        table_fks.each do |fk|
+          column_name = fk.fetch("column_name")
 
-        fk_columns.each do |column_name|
           if index_info.none? { |row| row.fetch("columns").split(",").first == column_name }
             agg.push(
               {
@@ -42,10 +38,6 @@ module RubyPgExtras
     end
 
     private
-
-    def all_tables
-      @_all_tables ||= query_module.table_size(in_format: :hash).map { |row| row.fetch("name") }
-    end
 
     def query_module
       RubyPgExtras

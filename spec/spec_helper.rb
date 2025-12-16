@@ -21,24 +21,26 @@ ENV["DATABASE_URL"] ||= "postgresql://postgres:secret@localhost:#{port}/ruby-pg-
 RSpec.configure do |config|
   config.before(:suite) do
     DB_SCHEMA = <<-SQL
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS subjects;
 DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS topics;
 DROP TABLE IF EXISTS companies;
 
+CREATE TABLE companies (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255)
+);
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255),
-    company_id INTEGER
-);
-
-CREATE TABLE posts (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    topic_id INTEGER,
-    external_id INTEGER,
-    title VARCHAR(255),
-    CONSTRAINT fk_posts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    company_id INTEGER,
+    customer_id INTEGER,
+    CONSTRAINT fk_users_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 );
 
 CREATE TABLE topics (
@@ -46,9 +48,36 @@ CREATE TABLE topics (
     title VARCHAR(255)
 );
 
-CREATE TABLE companies (
+CREATE TABLE posts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    topic_id INTEGER,
+    category_id INTEGER,
+    external_id INTEGER,
+    title VARCHAR(255),
+    CONSTRAINT fk_posts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_posts_topic FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
+);
+
+CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255)
+);
+
+CREATE TABLE categories (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255)
+);
+
+CREATE TABLE subjects (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255)
+);
+
+CREATE TABLE events (
+    id SERIAL PRIMARY KEY,
+    subject_id INTEGER,
+    subject_type VARCHAR(255)
 );
 
 CREATE INDEX index_posts_on_user_id ON posts(user_id, topic_id);
