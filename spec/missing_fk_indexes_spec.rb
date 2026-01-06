@@ -18,4 +18,26 @@ describe "missing_fk_indexes" do
       { table: "posts", column_name: "topic_id" },
     ])
   end
+
+  it "supports ignoring a specific table+column via args" do
+    result = RubyPgExtras.missing_fk_indexes(
+      args: { ignore_list: ["posts.topic_id"] },
+      in_format: :hash
+    )
+
+    expect(result).to eq([
+      { table: "users", column_name: "company_id" },
+    ])
+  end
+
+  it "supports ignoring a column name globally via args" do
+    result = RubyPgExtras.missing_fk_indexes(
+      args: { ignore_list: ["company_id"] },
+      in_format: :hash
+    )
+
+    expect(result).to eq([
+      { table: "posts", column_name: "topic_id" },
+    ])
+  end
 end

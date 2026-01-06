@@ -192,7 +192,7 @@ module RubyPgExtras
   end
 
   def self.missing_fk_indexes(args: {}, in_format: :display_table)
-    RubyPgExtras::MissingFkIndexes.call(args[:table_name])
+    RubyPgExtras::MissingFkIndexes.call(args[:table_name], ignore_list: args[:ignore_list])
   end
 
   def self.missing_fk_constraints(args: {}, in_format: :display_table)

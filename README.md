@@ -136,6 +136,16 @@ RubyPgExtras.missing_fk_indexes(args: { table_name: "users" })
 
 ```
 
+You can also exclude known/intentional cases using `ignore_list` (array or comma-separated string), with entries like:
+- `"posts.topic_id"` (ignore a specific table+column)
+- `"topic_id"` (ignore this column name for all tables)
+- `"posts.*"` (ignore all columns on a table)
+- `"*"` (ignore everything)
+
+```ruby
+RubyPgExtras.missing_fk_indexes(args: { ignore_list: ["users.company_id", "posts.*"] })
+```
+
 `table_name` argument is optional, if omitted, the method will display missing fk indexes for all the tables.
 
 ## `missing_fk_constraints`
