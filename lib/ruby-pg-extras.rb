@@ -247,6 +247,8 @@ module RubyPgExtras
   end
 
   def self.database_url=(value)
+    @_connection&.close
+    @_connection = nil
     @@database_url = value
   end
 

@@ -65,5 +65,17 @@ describe RubyPgExtras do
         RubyPgExtras.bloat(in_format: :hash)
       end.not_to raise_error
     end
+
+    it "resets the connection when setting database URL" do
+      old_connection = RubyPgExtras.connection
+      expect(old_connection).not_to be_finished
+
+      RubyPgExtras.database_url = ENV.fetch("DATABASE_URL")
+
+      expect(old_connection).to be_finished
+      new_connection = RubyPgExtras.connection
+      expect(new_connection).not_to eq(old_connection)
+      expect(new_connection).not_to be_finished
+    end
   end
 end
