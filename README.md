@@ -120,6 +120,8 @@ Keep reading to learn about methods that `diagnose` uses under the hood.
 
 This method lists **actual foreign key columns** (based on existing foreign key constraints) which don't have a supporting index. It's recommended to always index foreign key columns because they are commonly used for lookups and join conditions.
 
+Composite indexes only support a foreign key when the foreign key column is the leftmost key column. For example, an index on `(user_id, topic_id)` supports `user_id` lookups, but `topic_id` still needs its own index or an index that starts with `topic_id`. Partial indexes are ignored for this check because they don't cover every row.
+
 You can add indexes on the columns returned by this query and later check if they are receiving scans using the [unused_indexes method](#unused_indexes). Please remember that each index decreases write performance and autovacuuming overhead, so be careful when adding multiple indexes to often updated tables.
 
 ```ruby
@@ -225,20 +227,21 @@ RubyPgExtras.table_foreign_keys(args: { table_name: "users" })
 
 ### `index_info`
 
-This method returns summary info about database indexes. You can check index size, how often it is used and what percentage of its total size are NULL values. Like the previous method, it aggregates data from other helper methods in an easy-to-digest format.
+This method returns summary info about database indexes. You can check index size, how often it is used, whether it is unique/primary/partial, what predicate it uses, and what percentage of its total size are NULL values. Like the previous method, it aggregates data from other helper methods in an easy-to-digest format.
+
+Index columns are read from PostgreSQL catalog metadata instead of parsing `CREATE INDEX` strings. This keeps expression indexes, operator classes, sort order, collations, partial predicates, and `INCLUDE` columns represented correctly. `Columns` shows the display form of key columns, while `Included columns` shows non-key columns added with `INCLUDE (...)`.
 
 ```ruby
 
 RubyPgExtras.index_info(args: { table_name: "users" })
 
-| Index name                    | Table name | Columns        | Index size | Index scans | Null frac |
-+-------------------------------+------------+----------------+------------+-------------+-----------+
-| users_pkey                    | users      | id             | 1152 kB    | 163007      | 0.00%     |
-| index_users_on_slack_id       | users      | slack_id       | 1080 kB    | 258870      | 0.00%     |
-| index_users_on_team_id        | users      | team_id        | 816 kB     | 70962       | 0.00%     |
-| index_users_on_uuid           | users      | uuid           | 1032 kB    | 0           | 0.00%     |
-| index_users_on_block_uuid     | users      | block_uuid     | 776 kB     | 19502       | 100.00%   |
-| index_users_on_api_auth_token | users      | api_auth_token | 1744 kB    | 156         | 0.00%     |
+| Index name                   | Table name | Columns                    | Included columns | Method | Unique | Primary | Partial | Predicate          | Index size | Index scans | Null frac |
++------------------------------+------------+----------------------------+------------------+--------+--------+---------+---------+--------------------+------------+-------------+-----------+
+| users_pkey                   | users      | id                         |                  | btree  | true   | true    | false   |                    | 1152 kB    | 163007      | 0.00%     |
+| index_users_on_email_pattern | users      | email text_pattern_ops     |                  | btree  | false  | false   | false   |                    | 1080 kB    | 258870      | 0.00%     |
+| index_users_on_created_at    | users      | created_at DESC NULLS LAST |                  | btree  | false  | false   | false   |                    | 816 kB     | 70962       | 0.00%     |
+| index_users_on_active_email  | users      | email                      |                  | btree  | false  | false   | true    | deleted_at IS NULL | 1032 kB    | 0           | 0.00%     |
+| index_users_on_email_include | users      | email                      | id               | btree  | false  | false   | false   |                    | 776 kB     | 19502       | 100.00%   |
 
 ```
 
