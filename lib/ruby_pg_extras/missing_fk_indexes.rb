@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "json"
+
 module RubyPgExtras
   class MissingFkIndexes
     # ignore_list: array (or comma-separated string) of entries like:
@@ -33,7 +35,7 @@ module RubyPgExtras
           # Skip columns explicitly excluded via ignore list.
           next if ignore_list_matcher.ignored?(table: table, column_name: column_name)
 
-          if index_info.none? { |row| row.fetch("columns").split(",").first == column_name }
+          if index_info.none? { |row| usable_index?(row, column_name: column_name) }
             agg.push(
               {
                 table: table,
@@ -48,6 +50,30 @@ module RubyPgExtras
     end
 
     private
+
+    def usable_index?(row, column_name:)
+      # A partial index cannot generally satisfy foreign key maintenance for every row.
+      return false if boolean_value(row.fetch("is_partial", false))
+
+      # PostgreSQL can use a composite index for FK checks only when the FK column is leftmost.
+      first_key_column(row) == column_name
+    end
+
+    def first_key_column(row)
+      # New index metadata exposes clean key column names; fall back for legacy/stubbed rows.
+      if row.key?("key_column_names") && row.fetch("key_column_names") != nil
+        JSON.parse(row.fetch("key_column_names")).first
+      elsif row.key?("key_columns") && row.fetch("key_columns") != nil
+        row.fetch("key_columns").split(",").map(&:strip).first
+      else
+        row.fetch("columns").split(",").map(&:strip).first
+      end
+    end
+
+    def boolean_value(value)
+      # PG::Result returns booleans as "t"/"f"; specs may provide real Ruby booleans.
+      [true, "t", "true"].include?(value)
+    end
 
     def query_module
       RubyPgExtras
