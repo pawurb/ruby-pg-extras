@@ -120,7 +120,7 @@ Keep reading to learn about methods that `diagnose` uses under the hood.
 
 This method lists **actual foreign key columns** (based on existing foreign key constraints) which don't have a supporting index. It's recommended to always index foreign key columns because they are commonly used for lookups and join conditions.
 
-Composite indexes only support a foreign key when the foreign key column is the leftmost key column. For example, an index on `(user_id, topic_id)` supports `user_id` lookups, but `topic_id` still needs its own index or an index that starts with `topic_id`. Partial indexes are ignored for this check because they don't cover every row.
+Composite indexes only support a foreign key when the foreign key column is the leftmost key column. For example, an index on `(user_id, topic_id)` supports `user_id` lookups, but `topic_id` still needs its own index or an index that starts with `topic_id`. Partial indexes are ignored for this check unless their predicate is exactly the foreign key column `IS NOT NULL`, because foreign key checks only need non-null values.
 
 You can add indexes on the columns returned by this query and later check if they are receiving scans using the [unused_indexes method](#unused_indexes). Please remember that each index decreases write performance and autovacuuming overhead, so be careful when adding multiple indexes to often updated tables.
 

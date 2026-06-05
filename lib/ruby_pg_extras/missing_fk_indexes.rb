@@ -52,11 +52,14 @@ module RubyPgExtras
     private
 
     def usable_index?(row, column_name:)
-      # A partial index cannot generally satisfy foreign key maintenance for every row.
-      return false if boolean_value(row.fetch("is_partial", false))
-
       # PostgreSQL can use a composite index for FK checks only when the FK column is leftmost.
-      first_key_column(row) == column_name
+      return false unless first_key_column(row) == column_name
+
+      # A full index on the FK column is always usable once the leftmost-column check passes.
+      return true unless boolean_value(row.fetch("is_partial", false))
+
+      # Nullable FK checks only need non-null values, so this partial index is still usable.
+      not_null_predicate_on_column?(row.fetch("predicate", nil), column_name: column_name)
     end
 
     def first_key_column(row)
@@ -67,6 +70,21 @@ module RubyPgExtras
         row.fetch("key_columns").split(",").map(&:strip).first
       else
         row.fetch("columns").split(",").map(&:strip).first
+      end
+    end
+
+    def not_null_predicate_on_column?(predicate, column_name:)
+      normalized_predicate = normalized_predicate(predicate)
+
+      # Keep this intentionally narrow: only `fk_column IS NOT NULL` guarantees FK coverage.
+      normalized_predicate.match?(/\A"?#{Regexp.escape(column_name)}"?\s+IS\s+NOT\s+NULL\z/i)
+    end
+
+    def normalized_predicate(predicate)
+      predicate.to_s.strip.then do |value|
+        # pg_get_expr can wrap simple predicates in parentheses, e.g. `(topic_id IS NOT NULL)`.
+        value = value[1...-1].strip while value.start_with?("(") && value.end_with?(")")
+        value
       end
     end
 

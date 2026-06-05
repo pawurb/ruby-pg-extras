@@ -30,7 +30,10 @@ DROP TABLE IF EXISTS collated_indexed_codes;
 DROP TABLE IF EXISTS opclass_indexed_codes;
 DROP TABLE IF EXISTS included_indexed_posts;
 DROP TABLE IF EXISTS sorted_indexed_posts;
+DROP TABLE IF EXISTS null_partial_indexed_posts;
+DROP TABLE IF EXISTS not_null_partial_indexed_posts;
 DROP TABLE IF EXISTS partial_indexed_posts;
+DROP TABLE IF EXISTS expression_not_null_partial_indexed_posts;
 DROP TABLE IF EXISTS expression_indexed_posts;
 DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS codes;
@@ -77,6 +80,12 @@ CREATE TABLE expression_indexed_posts (
     CONSTRAINT fk_expression_indexed_posts_topic FOREIGN KEY (topic_id) REFERENCES topics(id)
 );
 
+CREATE TABLE expression_not_null_partial_indexed_posts (
+    id SERIAL PRIMARY KEY,
+    topic_id INTEGER,
+    CONSTRAINT fk_expression_not_null_partial_indexed_posts_topic FOREIGN KEY (topic_id) REFERENCES topics(id)
+);
+
 CREATE TABLE partial_indexed_posts (
     id SERIAL PRIMARY KEY,
     topic_id INTEGER,
@@ -87,6 +96,18 @@ CREATE TABLE sorted_indexed_posts (
     id SERIAL PRIMARY KEY,
     topic_id INTEGER,
     CONSTRAINT fk_sorted_indexed_posts_topic FOREIGN KEY (topic_id) REFERENCES topics(id)
+);
+
+CREATE TABLE not_null_partial_indexed_posts (
+    id SERIAL PRIMARY KEY,
+    topic_id INTEGER,
+    CONSTRAINT fk_not_null_partial_indexed_posts_topic FOREIGN KEY (topic_id) REFERENCES topics(id)
+);
+
+CREATE TABLE null_partial_indexed_posts (
+    id SERIAL PRIMARY KEY,
+    topic_id INTEGER,
+    CONSTRAINT fk_null_partial_indexed_posts_topic FOREIGN KEY (topic_id) REFERENCES topics(id)
 );
 
 CREATE TABLE included_indexed_posts (
@@ -130,8 +151,11 @@ CREATE TABLE events (
 
 CREATE INDEX index_posts_on_user_id ON posts(user_id, topic_id);
 CREATE INDEX index_expression_indexed_posts_on_topic_id_expression ON expression_indexed_posts((topic_id::text));
+CREATE INDEX index_expr_not_null_partial_posts_on_topic_id ON expression_not_null_partial_indexed_posts((topic_id::text)) WHERE topic_id IS NOT NULL;
 CREATE INDEX index_partial_indexed_posts_on_topic_id ON partial_indexed_posts(topic_id) WHERE id > 0;
 CREATE INDEX index_sorted_indexed_posts_on_topic_id ON sorted_indexed_posts(topic_id DESC NULLS LAST);
+CREATE INDEX index_not_null_partial_indexed_posts_on_topic_id ON not_null_partial_indexed_posts(topic_id) WHERE topic_id IS NOT NULL;
+CREATE INDEX index_null_partial_indexed_posts_on_topic_id ON null_partial_indexed_posts(topic_id) WHERE topic_id IS NULL;
 CREATE INDEX index_included_indexed_posts_on_topic_id ON included_indexed_posts(topic_id) INCLUDE (id);
 CREATE INDEX index_opclass_indexed_codes_on_code ON opclass_indexed_codes(code text_pattern_ops);
 CREATE INDEX index_collated_indexed_codes_on_code ON collated_indexed_codes(code COLLATE "C");
