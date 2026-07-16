@@ -725,6 +725,21 @@ RubyPgExtras.vacuum_io_stats
 
 This command surfaces cumulative I/O statistics for autovacuum-related VACUUM activity, based on the `pg_stat_io` view introduced in PostgreSQL 16 ([pg_stat_io documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW)). It shows how many blocks autovacuum workers have read and written, how many buffer evictions and ring-buffer reuses occurred, and when the statistics were last reset; this is useful for determining whether autovacuum is responsible for I/O spikes, as described in the pganalyze article on `pg_stat_io` ([Tracking cumulative I/O activity by autovacuum and manual VACUUMs](https://pganalyze.com/blog/pg-stat-io#tracking-cumulative-io-activity-by-autovacuum-and-manual-vacuums)). On PostgreSQL versions below 16 this method returns a single informational row indicating that the feature is unavailable.
 
+### `update_stats`
+
+```ruby
+
+RubyPgExtras.update_stats
+
+ table  | fillfactor | total_updates | hot_updates | hot_pct | same_page_non_hot_updates | same_page_non_hot_pct | new_page_updates | new_page_pct | same_page_pct | hot_given_same_page_pct
+--------+------------+---------------+-------------+---------+---------------------------+-----------------------+------------------+--------------+---------------+-------------------------
+ users  |        100 |       1250000 |      980000 |   78.40 |                     45000 |                  3.60 |           225000 |        18.00 |         82.00 |                   95.61
+ orders |         80 |        450000 |      410000 |   91.11 |                     12000 |                  2.67 |            28000 |         6.22 |         93.78 |                   97.16
+ (truncated results for brevity)
+```
+
+This command breaks down table updates into HOT, same-page non-HOT, and new-page updates using `pg_stat_user_tables` columns including `n_tup_newpage_upd` ([pg_stat_all_tables documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ALL-TABLES-VIEW)). HOT updates require that changed columns are not indexed and that the new row version fits on the same page ([HOT updates in PostgreSQL for better performance](https://www.cybertec-postgresql.com/en/hot-updates-in-postgresql-for-better-performance/), [Heap-Only Tuples](https://www.postgresql.org/docs/current/storage-hot.html)). High `same_page_non_hot_pct` usually points to updates of indexed columns, while high `new_page_pct` often means pages are too full and lowering `fillfactor` (then rewriting the table with `VACUUM FULL` or `CLUSTER`) may help. These counters are cumulative and can be reset with PostgreSQL statistics-reset functions. On PostgreSQL versions below 16, where `n_tup_newpage_upd` is unavailable, the method returns a reduced breakdown of total, HOT, and non-HOT updates.
+
 ### `kill_all`
 
 ```ruby

@@ -28,7 +28,7 @@ module RubyPgExtras
     records_rank seq_scans table_index_scans table_indexes_size
     table_size total_index_size total_table_size
     unused_indexes duplicate_indexes vacuum_stats vacuum_progress vacuum_io_stats
-    analyze_progress
+    analyze_progress update_stats
     kill_all kill_pid
     pg_stat_statements_reset buffercache_stats
     buffercache_usage ssl_used connections
@@ -58,6 +58,8 @@ module RubyPgExtras
     vacuum_io_stats: {},
     vacuum_io_stats_legacy: {},
     analyze_progress: {},
+    update_stats: { schema: DEFAULT_SCHEMA },
+    update_stats_legacy: { schema: DEFAULT_SCHEMA },
     buffercache_stats: { limit: 10 },
     buffercache_usage: { limit: 20 },
     unused_indexes: { max_scans: 50, schema: DEFAULT_SCHEMA },
@@ -116,6 +118,15 @@ module RubyPgExtras
       server_version_num = conn.send(exec_method, "SHOW server_version_num").to_a[0].values[0].to_i
       if server_version_num < 160000
         query_name = :vacuum_io_stats_legacy
+      end
+    end
+
+    # The detailed update breakdown relies on n_tup_newpage_upd, available from PostgreSQL 16.
+    # Older versions fall back to the HOT/non-HOT breakdown in update_stats_legacy.
+    if query_name == :update_stats
+      server_version_num = conn.send(exec_method, "SHOW server_version_num").to_a[0].values[0].to_i
+      if server_version_num < 160000
+        query_name = :update_stats_legacy
       end
     end
 

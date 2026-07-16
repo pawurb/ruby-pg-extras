@@ -58,6 +58,63 @@ describe RubyPgExtras do
     end
   end
 
+  describe "update_stats" do
+    it "returns a consistent HOT update breakdown" do
+      connection = RubyPgExtras.connection
+      server_version_num = connection.exec("SHOW server_version_num").to_a[0].values[0].to_i
+
+      # Keep this fixture local so every run starts with fresh statistics counters
+      # and a controlled fillfactor for producing HOT and non-HOT updates.
+      connection.exec("DROP TABLE IF EXISTS update_stats_test")
+      connection.exec(<<~SQL)
+        CREATE TABLE update_stats_test (
+          id INTEGER PRIMARY KEY,
+          value TEXT
+        ) WITH (fillfactor = 80)
+      SQL
+      connection.exec("INSERT INTO update_stats_test VALUES (1, 'before')")
+      # Updating the unindexed value column produces a HOT update.
+      connection.exec("UPDATE update_stats_test SET value = 'after' WHERE id = 1")
+      # Updating the primary key requires index maintenance, producing a non-HOT update.
+      connection.exec("UPDATE update_stats_test SET id = 2 WHERE id = 1")
+
+      row = nil
+      # PostgreSQL publishes cumulative statistics asynchronously, particularly
+      # on older supported versions, so poll until both updates are visible.
+      20.times do
+        row = RubyPgExtras.update_stats(
+          args: { schema: "public" },
+          in_format: :hash,
+        ).find { |result| result["table"] == "update_stats_test" }
+        break if row && row["total_updates"].to_i == 2
+
+        sleep 0.1
+      end
+
+      expect(row).not_to be_nil
+      expect(row["fillfactor"].to_i).to eq(80)
+      expect(row["total_updates"].to_i).to eq(2)
+      expect(row["hot_updates"].to_i).to eq(1)
+
+      if server_version_num >= 160000
+        expect(row["same_page_non_hot_updates"].to_i).to eq(1)
+        expect(row["new_page_updates"].to_i).to eq(0)
+        expect(row["total_updates"].to_i).to eq(
+          row["hot_updates"].to_i +
+          row["same_page_non_hot_updates"].to_i +
+          row["new_page_updates"].to_i,
+        )
+      else
+        expect(row["non_hot_updates"].to_i).to eq(1)
+        expect(row["total_updates"].to_i).to eq(
+          row["hot_updates"].to_i + row["non_hot_updates"].to_i,
+        )
+      end
+    ensure
+      connection&.exec("DROP TABLE IF EXISTS update_stats_test")
+    end
+  end
+
   describe "#database_url=" do
     it "setting custom database URL works" do
       RubyPgExtras.database_url = ENV.fetch("DATABASE_URL")
