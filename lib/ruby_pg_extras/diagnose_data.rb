@@ -10,6 +10,8 @@ module RubyPgExtras
     PG_EXTRAS_NULL_MIN_NULL_FRAC_PERCENT = 50 # 50%
     PG_EXTRAS_BLOAT_MIN_VALUE = 10
     PG_EXTRAS_OUTLIERS_MIN_EXEC_RATIO = 33 # 33%
+    PG_EXTRAS_NEW_PAGE_UPDATES_MAX_PERCENT = 20 # 20%
+    PG_EXTRAS_NEW_PAGE_UPDATES_MIN_SAMPLE = 10_000
 
     def self.call
       new.call
@@ -26,6 +28,7 @@ module RubyPgExtras
         :unused_indexes,
         :null_indexes,
         :bloat,
+        :new_page_updates,
         :duplicate_indexes,
       ].yield_self do |checks|
         extensions_data = query_module.extensions(in_format: :hash)
@@ -288,6 +291,62 @@ module RubyPgExtras
         {
           ok: false,
           message: "Duplicate indexes detected:\n#{print_indexes}",
+        }
+      end
+    end
+
+    def new_page_updates
+      max_percent = ENV.fetch(
+        "PG_EXTRAS_NEW_PAGE_UPDATES_MAX_PERCENT",
+        PG_EXTRAS_NEW_PAGE_UPDATES_MAX_PERCENT,
+      ).to_f
+      min_sample = ENV.fetch(
+        "PG_EXTRAS_NEW_PAGE_UPDATES_MIN_SAMPLE",
+        PG_EXTRAS_NEW_PAGE_UPDATES_MIN_SAMPLE,
+      ).to_i
+
+      tables = query_module.update_stats(in_format: :hash)
+
+      if tables.any? && !tables.first.key?("new_page_pct")
+        return {
+          ok: true,
+          message: "New-page update analysis requires PostgreSQL 16 or newer.",
+        }
+      end
+
+      tables = tables.select do |table|
+        table.fetch("total_updates").to_i >= min_sample &&
+          table.fetch("new_page_pct").to_f >= max_percent
+      end
+
+      if tables.empty?
+        {
+          ok: true,
+          message: "No tables with a high new-page update ratio detected.",
+        }
+      else
+        table_details = tables.map do |table|
+          <<~DETAIL.strip
+            '#{table.fetch("table")}':
+              new-page updates: #{table.fetch("new_page_pct")}% (#{table.fetch("new_page_updates")} of #{table.fetch("total_updates")})
+              HOT among same-page updates: #{table.fetch("hot_given_same_page_pct")}%
+              fillfactor: #{table.fetch("fillfactor")}
+          DETAIL
+        end.join("\n\n")
+
+        {
+          ok: false,
+          message: <<~MESSAGE.strip,
+            High new-page update ratios detected:
+
+            #{table_details}
+
+            A high new-page ratio means successor tuple versions often do not fit on their original heap page and therefore cannot be HOT. Investigate page-space pressure, row growth, long-lived transactions, large update batches, and whether a lower table fillfactor is appropriate.
+
+            The HOT-among-same-page percentage provides additional context: a low value suggests indexed-column changes are also preventing HOT, so changing fillfactor alone may not resolve the issue.
+
+            These counters are cumulative; compare their deltas before and after a change.
+          MESSAGE
         }
       end
     end

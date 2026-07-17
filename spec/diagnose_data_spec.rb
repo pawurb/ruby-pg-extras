@@ -76,4 +76,116 @@ describe RubyPgExtras::DiagnoseData do
       end
     end
   end
+
+  describe "#new_page_updates" do
+    let(:diagnose_data) { described_class.new }
+
+    it "reports tables exceeding the update sample and new-page thresholds" do
+      allow(RubyPgExtras).to receive(:update_stats).with(in_format: :hash).and_return(
+        [
+          {
+            "table" => "orders",
+            "fillfactor" => "100",
+            "total_updates" => "10000",
+            "new_page_updates" => "2500",
+            "new_page_pct" => "25.00",
+            "hot_given_same_page_pct" => "90.00",
+          },
+          {
+            "table" => "users",
+            "fillfactor" => "80",
+            "total_updates" => "9999",
+            "new_page_updates" => "3000",
+            "new_page_pct" => "30.00",
+            "hot_given_same_page_pct" => "95.00",
+          },
+        ],
+      )
+
+      result = diagnose_data.send(:new_page_updates)
+
+      expect(result).to eq(
+        ok: false,
+        message: <<~MESSAGE.strip,
+          High new-page update ratios detected:
+
+          'orders':
+            new-page updates: 25.00% (2500 of 10000)
+            HOT among same-page updates: 90.00%
+            fillfactor: 100
+
+          A high new-page ratio means successor tuple versions often do not fit on their original heap page and therefore cannot be HOT. Investigate page-space pressure, row growth, long-lived transactions, large update batches, and whether a lower table fillfactor is appropriate.
+
+          The HOT-among-same-page percentage provides additional context: a low value suggests indexed-column changes are also preventing HOT, so changing fillfactor alone may not resolve the issue.
+
+          These counters are cumulative; compare their deltas before and after a change.
+        MESSAGE
+      )
+    end
+
+    it "does not report tables below either threshold" do
+      allow(RubyPgExtras).to receive(:update_stats).with(in_format: :hash).and_return(
+        [
+          {
+            "table" => "orders",
+            "total_updates" => "10000",
+            "new_page_pct" => "19.99",
+          },
+          {
+            "table" => "users",
+            "total_updates" => "9999",
+            "new_page_pct" => "25.00",
+          },
+        ],
+      )
+
+      expect(diagnose_data.send(:new_page_updates)).to eq(
+        ok: true,
+        message: "No tables with a high new-page update ratio detected.",
+      )
+    end
+
+    it "allows overriding the thresholds with environment variables" do
+      allow(RubyPgExtras).to receive(:update_stats).with(in_format: :hash).and_return(
+        [
+          {
+            "table" => "orders",
+            "fillfactor" => "100",
+            "total_updates" => "500",
+            "new_page_updates" => "75",
+            "new_page_pct" => "15.00",
+            "hot_given_same_page_pct" => "90.00",
+          },
+        ],
+      )
+      original_max_percent = ENV["PG_EXTRAS_NEW_PAGE_UPDATES_MAX_PERCENT"]
+      original_min_sample = ENV["PG_EXTRAS_NEW_PAGE_UPDATES_MIN_SAMPLE"]
+      ENV["PG_EXTRAS_NEW_PAGE_UPDATES_MAX_PERCENT"] = "15"
+      ENV["PG_EXTRAS_NEW_PAGE_UPDATES_MIN_SAMPLE"] = "500"
+
+      expect(diagnose_data.send(:new_page_updates).fetch(:ok)).to eq(false)
+    ensure
+      ENV["PG_EXTRAS_NEW_PAGE_UPDATES_MAX_PERCENT"] = original_max_percent
+      ENV["PG_EXTRAS_NEW_PAGE_UPDATES_MIN_SAMPLE"] = original_min_sample
+    end
+
+    it "skips the check when update_stats returns the legacy breakdown" do
+      allow(RubyPgExtras).to receive(:update_stats).with(in_format: :hash).and_return(
+        [
+          {
+            "table" => "orders",
+            "total_updates" => "10000",
+            "hot_updates" => "5000",
+            "hot_pct" => "50.00",
+          },
+        ],
+      )
+
+      expect(diagnose_data.send(:new_page_updates)).to eq(
+        ok: true,
+        message: "New-page update analysis requires PostgreSQL 16 or newer.",
+      )
+    end
+
+  end
 end
