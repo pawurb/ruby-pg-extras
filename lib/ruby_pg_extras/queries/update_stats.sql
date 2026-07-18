@@ -24,10 +24,12 @@ WITH table_stats AS (
 SELECT
   relname AS table,
   fillfactor,
-  ROUND(
-    pg_relation_size(relid)::numeric
-    / NULLIF(reltuples, 0)
-  )::bigint AS avg_row_bytes,
+  CASE
+    WHEN reltuples > 0 THEN
+      ROUND(
+        pg_relation_size(relid)::numeric / reltuples
+      )::bigint
+  END AS estimated_heap_bytes_per_live_row,
   n_tup_upd AS total_updates,
   n_tup_hot_upd AS hot_updates,
   ROUND(

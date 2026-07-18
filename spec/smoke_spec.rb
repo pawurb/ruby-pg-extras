@@ -77,8 +77,8 @@ describe RubyPgExtras do
       connection.exec("UPDATE update_stats_test SET value = 'after' WHERE id = 1")
       # Updating the primary key requires index maintenance, producing a non-HOT update.
       connection.exec("UPDATE update_stats_test SET id = 2 WHERE id = 1")
-      # avg_row_bytes divides heap size by pg_class.reltuples, which is only
-      # populated after ANALYZE (or VACUUM).
+      # estimated_heap_bytes_per_live_row divides main-fork heap size by
+      # pg_class.reltuples, which is only populated after ANALYZE (or VACUUM).
       connection.exec("ANALYZE update_stats_test")
 
       row = nil
@@ -96,7 +96,7 @@ describe RubyPgExtras do
 
       expect(row).not_to be_nil
       expect(row["fillfactor"].to_i).to eq(80)
-      expect(row["avg_row_bytes"].to_i).to be > 0
+      expect(row["estimated_heap_bytes_per_live_row"].to_i).to be > 0
       expect(row["total_updates"].to_i).to eq(2)
       expect(row["hot_updates"].to_i).to eq(1)
 

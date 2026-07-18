@@ -59,6 +59,11 @@ describe RubyPgExtras::DiagnoseData do
             { table: "posts", column_name: "topic_id" },
           ]
         }
+
+        expect(RubyPgExtras)
+          .to receive(:update_stats)
+          .with(in_format: :hash)
+          .and_return([])
       end
 
       it "works" do
@@ -114,9 +119,9 @@ describe RubyPgExtras::DiagnoseData do
             HOT among same-page updates: 90.00%
             fillfactor: 100
 
-          A high new-page ratio means successor tuple versions often do not fit on their original heap page and therefore cannot be HOT. Investigate page-space pressure, row growth, long-lived transactions, large update batches, and whether a lower table fillfactor is appropriate.
+          A high new-page ratio means many successor tuple versions were placed on another heap page and therefore could not be HOT. This commonly indicates insufficient reusable space on the original page. `n_tup_newpage_upd` records that placement directly; it does not identify the underlying reason or whether the update would otherwise have been HOT-eligible. Investigate page-space pressure, row growth, long-lived transactions, large update batches, and whether a lower table fillfactor is appropriate.
 
-          The HOT-among-same-page percentage provides additional context: a low value suggests indexed-column changes are also preventing HOT, so changing fillfactor alone may not resolve the issue.
+          The HOT-among-same-page percentage provides additional context: a low value suggests indexed-column changes are preventing HOT on updates that did stay on the same page, so changing fillfactor alone may not resolve the issue.
 
           These counters are cumulative; compare their deltas before and after a change.
         MESSAGE
