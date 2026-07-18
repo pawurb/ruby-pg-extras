@@ -63,6 +63,7 @@ describe RubyPgExtras::DiagnoseData do
         expect(RubyPgExtras)
           .to receive(:update_stats)
           .with(in_format: :hash)
+          .twice
           .and_return([])
       end
 
@@ -191,6 +192,140 @@ describe RubyPgExtras::DiagnoseData do
         message: "New-page update analysis requires PostgreSQL 16 or newer.",
       )
     end
+  end
 
+  describe "#low_hot_same_page" do
+    let(:diagnose_data) { described_class.new }
+
+    it "reports tables below the HOT-among-same-page threshold" do
+      allow(RubyPgExtras).to receive(:update_stats).with(in_format: :hash).and_return(
+        [
+          {
+            "table" => "sessions",
+            "fillfactor" => "100",
+            "total_updates" => "10000",
+            "same_page_pct" => "95.61",
+            "new_page_pct" => "4.39",
+            "hot_given_same_page_pct" => "0.0",
+          },
+          {
+            "table" => "orders",
+            "fillfactor" => "80",
+            "total_updates" => "10000",
+            "same_page_pct" => "90.00",
+            "new_page_pct" => "10.00",
+            "hot_given_same_page_pct" => "10.00",
+          },
+          {
+            "table" => "users",
+            "fillfactor" => "100",
+            "total_updates" => "9999",
+            "same_page_pct" => "99.00",
+            "new_page_pct" => "1.00",
+            "hot_given_same_page_pct" => "0.0",
+          },
+        ],
+      )
+
+      result = diagnose_data.send(:low_hot_same_page)
+
+      expect(result).to eq(
+        ok: false,
+        message: <<~MESSAGE.strip,
+          Low HOT-among-same-page update ratios detected:
+
+          'sessions':
+            HOT among same-page updates: 0.0%
+            same-page updates: 95.61%
+            new-page updates: 4.39%
+            fillfactor: 100
+
+          A low HOT-among-same-page ratio means updates that stayed on the original heap page still could not be HOT. That usually means those updates modified indexed columns. Review which columns your application updates and which indexes cover them; removing or adjusting indexes on frequently updated columns (or avoiding updating those columns) can restore HOT updates and reduce index and vacuum overhead.
+
+          These counters are cumulative; compare their deltas before and after a change.
+        MESSAGE
+      )
+    end
+
+    it "does not report tables at or above the threshold" do
+      allow(RubyPgExtras).to receive(:update_stats).with(in_format: :hash).and_return(
+        [
+          {
+            "table" => "orders",
+            "total_updates" => "10000",
+            "hot_given_same_page_pct" => "10.00",
+          },
+          {
+            "table" => "users",
+            "total_updates" => "9999",
+            "hot_given_same_page_pct" => "0.0",
+          },
+        ],
+      )
+
+      expect(diagnose_data.send(:low_hot_same_page)).to eq(
+        ok: true,
+        message: "No tables with a low HOT-among-same-page update ratio detected.",
+      )
+    end
+
+    it "skips tables with a NULL HOT-among-same-page ratio" do
+      allow(RubyPgExtras).to receive(:update_stats).with(in_format: :hash).and_return(
+        [
+          {
+            "table" => "orders",
+            "total_updates" => "10000",
+            "hot_given_same_page_pct" => nil,
+          },
+        ],
+      )
+
+      expect(diagnose_data.send(:low_hot_same_page)).to eq(
+        ok: true,
+        message: "No tables with a low HOT-among-same-page update ratio detected.",
+      )
+    end
+
+    it "allows overriding the thresholds with environment variables" do
+      allow(RubyPgExtras).to receive(:update_stats).with(in_format: :hash).and_return(
+        [
+          {
+            "table" => "sessions",
+            "fillfactor" => "100",
+            "total_updates" => "500",
+            "same_page_pct" => "90.00",
+            "new_page_pct" => "10.00",
+            "hot_given_same_page_pct" => "4.00",
+          },
+        ],
+      )
+      original_min_percent = ENV["PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_PERCENT"]
+      original_min_sample = ENV["PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_SAMPLE"]
+      ENV["PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_PERCENT"] = "5"
+      ENV["PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_SAMPLE"] = "500"
+
+      expect(diagnose_data.send(:low_hot_same_page).fetch(:ok)).to eq(false)
+    ensure
+      ENV["PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_PERCENT"] = original_min_percent
+      ENV["PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_SAMPLE"] = original_min_sample
+    end
+
+    it "skips the check when update_stats returns the legacy breakdown" do
+      allow(RubyPgExtras).to receive(:update_stats).with(in_format: :hash).and_return(
+        [
+          {
+            "table" => "orders",
+            "total_updates" => "10000",
+            "hot_updates" => "5000",
+            "hot_pct" => "50.00",
+          },
+        ],
+      )
+
+      expect(diagnose_data.send(:low_hot_same_page)).to eq(
+        ok: true,
+        message: "HOT-among-same-page update analysis requires PostgreSQL 16 or newer.",
+      )
+    end
   end
 end

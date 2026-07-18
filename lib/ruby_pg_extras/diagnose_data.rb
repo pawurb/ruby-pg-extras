@@ -12,6 +12,8 @@ module RubyPgExtras
     PG_EXTRAS_OUTLIERS_MIN_EXEC_RATIO = 33 # 33%
     PG_EXTRAS_NEW_PAGE_UPDATES_MAX_PERCENT = 20 # 20%
     PG_EXTRAS_NEW_PAGE_UPDATES_MIN_SAMPLE = 10_000
+    PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_PERCENT = 10 # 10%
+    PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_SAMPLE = 10_000
 
     def self.call
       new.call
@@ -29,6 +31,7 @@ module RubyPgExtras
         :null_indexes,
         :bloat,
         :new_page_updates,
+        :low_hot_same_page,
         :duplicate_indexes,
       ].yield_self do |checks|
         extensions_data = query_module.extensions(in_format: :hash)
@@ -344,6 +347,64 @@ module RubyPgExtras
             A high new-page ratio means many successor tuple versions were placed on another heap page and therefore could not be HOT. This commonly indicates insufficient reusable space on the original page. `n_tup_newpage_upd` records that placement directly; it does not identify the underlying reason or whether the update would otherwise have been HOT-eligible. Investigate page-space pressure, row growth, long-lived transactions, large update batches, and whether a lower table fillfactor is appropriate.
 
             The HOT-among-same-page percentage provides additional context: a low value suggests indexed-column changes are preventing HOT on updates that did stay on the same page, so changing fillfactor alone may not resolve the issue.
+
+            These counters are cumulative; compare their deltas before and after a change.
+          MESSAGE
+        }
+      end
+    end
+
+    def low_hot_same_page
+      min_percent = ENV.fetch(
+        "PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_PERCENT",
+        PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_PERCENT,
+      ).to_f
+      min_sample = ENV.fetch(
+        "PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_SAMPLE",
+        PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_SAMPLE,
+      ).to_i
+
+      tables = query_module.update_stats(in_format: :hash)
+
+      if tables.any? && !tables.first.key?("hot_given_same_page_pct")
+        return {
+          ok: true,
+          message: "HOT-among-same-page update analysis requires PostgreSQL 16 or newer.",
+        }
+      end
+
+      tables = tables.select do |table|
+        hot_given_same_page_pct = table["hot_given_same_page_pct"]
+        next false if hot_given_same_page_pct.nil?
+
+        table.fetch("total_updates").to_i >= min_sample &&
+          hot_given_same_page_pct.to_f < min_percent
+      end
+
+      if tables.empty?
+        {
+          ok: true,
+          message: "No tables with a low HOT-among-same-page update ratio detected.",
+        }
+      else
+        table_details = tables.map do |table|
+          <<~DETAIL.strip
+            '#{table.fetch("table")}':
+              HOT among same-page updates: #{table.fetch("hot_given_same_page_pct")}%
+              same-page updates: #{table.fetch("same_page_pct")}%
+              new-page updates: #{table.fetch("new_page_pct")}%
+              fillfactor: #{table.fetch("fillfactor")}
+          DETAIL
+        end.join("\n\n")
+
+        {
+          ok: false,
+          message: <<~MESSAGE.strip,
+            Low HOT-among-same-page update ratios detected:
+
+            #{table_details}
+
+            A low HOT-among-same-page ratio means updates that stayed on the original heap page still could not be HOT. That usually means those updates modified indexed columns. Review which columns your application updates and which indexes cover them; removing or adjusting indexes on frequently updated columns (or avoiding updating those columns) can restore HOT updates and reduce index and vacuum overhead.
 
             These counters are cumulative; compare their deltas before and after a change.
           MESSAGE

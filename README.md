@@ -129,6 +129,21 @@ ENV["PG_EXTRAS_NEW_PAGE_UPDATES_MAX_PERCENT"] = "15"
 
 The underlying counters are cumulative, so compare their values over time rather than treating a single snapshot as definitive.
 
+### `low_hot_same_page`
+
+This is a `diagnose` check, not a standalone query method. On PostgreSQL 16 and newer, it uses the [`update_stats`](#update_stats) breakdown to flag tables where updates that stayed on the original heap page were almost never HOT. That usually means those updates modified indexed columns, so lowering `fillfactor` alone will not help.
+
+By default, a table is reported when it has at least 10,000 cumulative updates and fewer than 10% of its same-page updates were HOT. The report includes each table's HOT-among-same-page ratio, same-page and new-page ratios, and current `fillfactor`. Review which columns your application updates and which indexes cover them; removing or adjusting indexes on frequently updated columns (or avoiding updating those columns) can restore HOT updates.
+
+You can override the default thresholds with environment variables:
+
+```ruby
+ENV["PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_SAMPLE"] = "5000"
+ENV["PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_PERCENT"] = "5"
+```
+
+The underlying counters are cumulative, so compare their values over time rather than treating a single snapshot as definitive.
+
 ## Available methods
 
 ### `missing_fk_indexes`
