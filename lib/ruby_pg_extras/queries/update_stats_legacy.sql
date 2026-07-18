@@ -6,6 +6,7 @@ WITH table_stats AS (
     s.relname,
     s.n_tup_upd,
     s.n_tup_hot_upd,
+    c.reltuples,
     COALESCE(
       (
         SELECT option_value::integer
@@ -21,6 +22,10 @@ WITH table_stats AS (
 SELECT
   relname AS table,
   fillfactor,
+  ROUND(
+    pg_relation_size(relid)::numeric
+    / NULLIF(reltuples, 0)
+  )::bigint AS avg_row_bytes,
   n_tup_upd AS total_updates,
   n_tup_hot_upd AS hot_updates,
   ROUND(
