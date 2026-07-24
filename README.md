@@ -114,6 +114,36 @@ RubyPgExtras.diagnose
 
 Keep reading to learn about methods that `diagnose` uses under the hood.
 
+### `new_page_updates`
+
+This is a `diagnose` check, not a standalone query method. On PostgreSQL 16 and newer, it uses the [`update_stats`](#update_stats) breakdown to flag tables where a significant share of updates placed the new row version on another heap page instead of staying on the original page. Those tables are worth reviewing for page-space pressure, row growth, and whether a lower table `fillfactor` would help.
+
+By default, a table is reported when it has at least 10,000 cumulative updates and 20% or more of its updates are new-page updates. The report includes each table's new-page ratio, current `fillfactor`, and the percentage of same-page updates that were HOT. A low HOT-among-same-page value suggests indexed-column changes are also preventing HOT, so lowering `fillfactor` alone may not be enough.
+
+You can override the default thresholds with environment variables:
+
+```ruby
+ENV["PG_EXTRAS_NEW_PAGE_UPDATES_MIN_SAMPLE"] = "5000"
+ENV["PG_EXTRAS_NEW_PAGE_UPDATES_MAX_PERCENT"] = "15"
+```
+
+The underlying counters are cumulative, so compare their values over time rather than treating a single snapshot as definitive.
+
+### `low_hot_same_page`
+
+This is a `diagnose` check, not a standalone query method. On PostgreSQL 16 and newer, it uses the [`update_stats`](#update_stats) breakdown to flag tables where updates that stayed on the original heap page were almost never HOT. That usually means those updates modified indexed columns, so lowering `fillfactor` alone will not help.
+
+By default, a table is reported when it has at least 10,000 cumulative updates and fewer than 10% of its same-page updates were HOT. The report includes each table's HOT-among-same-page ratio, same-page and new-page ratios, and current `fillfactor`. Review which columns your application updates and which indexes cover them; removing or adjusting indexes on frequently updated columns (or avoiding updating those columns) can restore HOT updates.
+
+You can override the default thresholds with environment variables:
+
+```ruby
+ENV["PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_SAMPLE"] = "5000"
+ENV["PG_EXTRAS_LOW_HOT_SAME_PAGE_MIN_PERCENT"] = "5"
+```
+
+The underlying counters are cumulative, so compare their values over time rather than treating a single snapshot as definitive.
+
 ## Available methods
 
 ### `missing_fk_indexes`
@@ -724,6 +754,21 @@ RubyPgExtras.vacuum_io_stats
 ```
 
 This command surfaces cumulative I/O statistics for autovacuum-related VACUUM activity, based on the `pg_stat_io` view introduced in PostgreSQL 16 ([pg_stat_io documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW)). It shows how many blocks autovacuum workers have read and written, how many buffer evictions and ring-buffer reuses occurred, and when the statistics were last reset; this is useful for determining whether autovacuum is responsible for I/O spikes, as described in the pganalyze article on `pg_stat_io` ([Tracking cumulative I/O activity by autovacuum and manual VACUUMs](https://pganalyze.com/blog/pg-stat-io#tracking-cumulative-io-activity-by-autovacuum-and-manual-vacuums)). On PostgreSQL versions below 16 this method returns a single informational row indicating that the feature is unavailable.
+
+### `update_stats`
+
+```ruby
+
+RubyPgExtras.update_stats
+
+ table  | fillfactor | estimated_heap_bytes_per_live_row | total_updates | hot_updates | hot_pct | same_page_non_hot_updates | same_page_non_hot_pct | new_page_updates | new_page_pct | same_page_pct | hot_given_same_page_pct
+--------+------------+-----------------------------------+---------------+-------------+---------+---------------------------+-----------------------+------------------+--------------+---------------+-------------------------
+ users  |        100 |                               256 |       1250000 |      980000 |   78.40 |                     45000 |                  3.60 |           225000 |        18.00 |         82.00 |                   95.61
+ orders |         80 |                               128 |        450000 |      410000 |   91.11 |                     12000 |                  2.67 |            28000 |         6.22 |         93.78 |                   97.16
+ (truncated results for brevity)
+```
+
+This command breaks down table updates into HOT, same-page non-HOT, and new-page updates using `pg_stat_user_tables` columns including `n_tup_newpage_upd` ([pg_stat_all_tables documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ALL-TABLES-VIEW)). HOT updates require that changed columns are not indexed and that the new row version fits on the same page ([HOT updates in PostgreSQL for better performance](https://www.cybertec-postgresql.com/en/hot-updates-in-postgresql-for-better-performance/), [Heap-Only Tuples](https://www.postgresql.org/docs/current/storage-hot.html)). High `same_page_non_hot_pct` usually points to updates of indexed columns, while high `new_page_pct` often means pages are too full and lowering `fillfactor` (then rewriting the table with `VACUUM FULL` or `CLUSTER`) may help. `estimated_heap_bytes_per_live_row` divides main-fork heap size by `pg_class.reltuples` when that estimate is positive; it reflects physical storage per estimated live row (including page overhead, fillfactor free space, and bloat) rather than logical tuple width, and is NULL until the table has been analyzed or vacuumed. Larger values often call for a lower `fillfactor`. These counters are cumulative and can be reset with PostgreSQL statistics-reset functions. On PostgreSQL versions below 16, where `n_tup_newpage_upd` is unavailable, the method returns a reduced breakdown of total, HOT, and non-HOT updates.
 
 ### `kill_all`
 
